@@ -1,0 +1,49 @@
+#+TITLE: CoulombIntegrals.jl
+#+AUTHOR: Stefanos Carlström
+#+EMAIL: stefanos.carlstrom@gmail.com
+
+[[https://travis-ci.org/jagot/CoulombIntegrals.jl][https://travis-ci.org/jagot/CoulombIntegrals.jl.svg?branch=master]]
+[[https://ci.appveyor.com/project/jagot/coulombintegrals-jl][https://img.shields.io/appveyor/ci/jagot/coulombintegrals-jl.svg?logo=appveyor]]
+[[https://codecov.io/gh/jagot/CoulombIntegrals.jl][https://codecov.io/gh/jagot/CoulombIntegrals.jl/branch/master/graph/badge.svg]]
+
+* Introduction
+  Small library to calculate the different integrals that arise from
+  Coulomb repulsion. Among these are e.g. the Slater integrals. There
+  are different methods of varying speed and accuracy, and the
+  intention is to implement at least a few to be able to compare.
+
+  The library is intended to be independent of basis chosen, and is
+  based off [[https://github.com/JuliaApproximation/ContinuumArrays.jl][ContinuumArrays.jl]]. However, at the moment only
+  [[https://github.com/jagot/FiniteDifferencesQuasi.jl][FiniteDifferencesQuasi.jl]] and [[https://github.com/jagot/FEDVRQuasi.jl][FEDVRQuasi.jl]] are supported. Moreover,
+  it is only possible to work with 1d bases, i.e. tensorial bases are
+  not yet supported.
+
+* References
+  - Froese Fischer, C., Brage, T., & Jönsson, P. (1997). Computational
+    Atomic Structure : An MCHF Approach. Bristol, UK Philadelphia, Penn:
+    Institute of Physics Publ.
+
+  - Brage, T., & Fischer, C. F. (1994). Spline-Galerkin Methods for
+    Rydberg Series, Including Breit-Pauli Effects. Journal of Physics B:
+    Atomic, Molecular and Optical Physics, 27(22),
+    5467–5484. http://dx.doi.org/10.1088/0953-4075/27/22/007
+
+  - Qiu, Y., & Fischer, C. F. (1999). Integration by cell algorithm for
+    slater integrals in a spline basis. Journal of Computational
+    Physics, 156(2), 257–271. http://dx.doi.org/10.1006/jcph.1999.6361
+
+  - McCurdy, C. W., & Martín, F. (2004). Implementation of exterior
+    complex scaling in b-splines to solve atomic and molecular collision
+    problems. Journal of Physics B: Atomic, Molecular and Optical
+    Physics, 37(4),
+    917–936. http://dx.doi.org/10.1088/0953-4075/37/4/017
+
+  - McCurdy, C. W., Baertschy, M., & Rescigno, T. N. (2004). Solving the
+    three-body coulomb breakup problem using exterior complex
+    scaling. Journal of Physics B: Atomic, Molecular and Optical
+    Physics, 37(17),
+    137–187. http://dx.doi.org/10.1088/0953-4075/37/17/r01
+
+  - Zatsarinny, O. (2006). Bsr: b-spline atomic R-matrix codes. Computer
+    Physics Communications, 174(4),
+    273–356. http://dx.doi.org/10.1016/j.cpc.2005.10.006

@@ -61,7 +61,7 @@ function copyto!(dest::AbstractVector{T},
                                         <:QuasiAdjoint{<:Any,<:Basis},
                                         <:Basis,
                                         <:AbstractVector}}) where {T,Basis<:AbstractQuasiMatrix{T}}
-    axes(dest) == axes(M) || throw(DimensionMismatch("Icompatible axes"))
+    axes(dest) == axes(M) || throw(DimensionMismatch("Incompatible axes"))
     u,A,B,O,C,D,v = M.factors
     A' == B == C' == D || throw(DimensionMismatch("Incompatible bases"))
     dest[1,1] = u*O*v

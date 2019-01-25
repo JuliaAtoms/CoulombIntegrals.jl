@@ -19,10 +19,11 @@ struct PoissonProblem{T,U,B<:AbstractQuasiMatrix,
     rᵏ::RV
     rᵏ⁺¹::V
     rₘₐₓ⁻²ᵏ⁺¹::U
-    Tᵏ::M
-    uv::LD
-    ρ::RO₁
-    w′::RO₂
+    Tᵏ::M # Laplacian
+    uv::LD # Lazy mutual density
+    ρ::RO₁ # Mutual density
+    y::RO₂ # Intermediate vector
+    w′::RO₂ # Solution
     solve_iterable::SolveIterable
 end
 
@@ -69,15 +70,17 @@ function PoissonProblem(k::Int, u::RO₁, v::RO₁;
 
     ρ = similar(u)
     R,w′c = w′.mul.factors
-    w′c .= 0
+    y = similar(w′)
+    yc = y.mul.factors[2]
+    yc .= 0
 
     r = locs(R)
 
     prec = aspreconditioner(ruge_stuben(sparse(Tᵏ)))
-    solver_iterable = cg_iterator!(w′c, Tᵏ, ρ.mul.factors[2], prec; kwargs...)
+    solver_iterable = cg_iterator!(yc, Tᵏ, ρ.mul.factors[2], prec; initially_zero=true, kwargs...)
     solver_iterable.reltol = sqrt(eps(real(eltype(w′c))))
     pp = PoissonProblem(k, inv.(r), R*(r.^k), r.^(k+1), inv(r[end]^(2k+1)),
-                        Tᵏ, u .⋆ v, ρ, w′, solver_iterable)
+                        Tᵏ, u .⋆ v, ρ, y, w′, solver_iterable)
     pp
 end
 
@@ -144,6 +147,7 @@ end
 function (pp::PoissonProblem)(; verbosity=0, kwargs...)
     k,ρ,r⁻¹ = pp.k,pp.ρ,pp.r⁻¹
     ρc = ρ.mul.factors[2]
+    yc = pp.y.mul.factors[2]
     wc = pp.w′.mul.factors[2]
 
     copyto!(ρ, pp.uv) # Form density
@@ -160,6 +164,8 @@ function (pp::PoissonProblem)(; verbosity=0, kwargs...)
     verbosity > 0 && println("Converged: ", IterativeSolvers.converged(iterable) ? "yes" : "no",
                             ", #iterations: ", ii, "/", iterable.maxiter,
                             ", residual: ", iterable.residual)
+
+    copyto!(wc, yc)
 
     # Add in homogeneous contribution
     s = (ρ'pp.rᵏ)[1]*pp.rₘₐₓ⁻²ᵏ⁺¹

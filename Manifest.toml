@@ -151,11 +151,9 @@ version = "0.20.0"
 
 [[LazyArrays]]
 deps = ["FillArrays", "LinearAlgebra", "StaticArrays", "Test"]
-git-tree-sha1 = "282c4d8f504748fcf2530f1f34713c3581093ffc"
-repo-rev = "master"
-repo-url = "LazyArrays"
+git-tree-sha1 = "804f03d3dab6954b0a4043d253366ccfa08b7b19"
 uuid = "5078a376-72f3-5289-bfd5-ec5146d43c02"
-version = "0.5.1+"
+version = "0.5.1"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"

@@ -4,11 +4,17 @@ git-tree-sha1 = "8d59c3b1463b5e0ad05a3698167f85fac90e184d"
 uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
 version = "0.3.2"
 
+[[AlgebraicMultigrid]]
+deps = ["Compat", "IterativeSolvers", "Random"]
+git-tree-sha1 = "23f59a45d2c8f792356c98839cda84fcc388c8b0"
+uuid = "2169fc97-5a83-5252-b627-83903c6c433c"
+version = "0.2.1"
+
 [[BandedMatrices]]
 deps = ["FillArrays", "LazyArrays", "LinearAlgebra", "Random", "SparseArrays", "Test"]
-git-tree-sha1 = "d3c8a883d5470def5f5a2b3c5b20ea5080d325e8"
+git-tree-sha1 = "3804222a671e7e4f697cc31b6639592ba8ae00ae"
 uuid = "aae01518-5342-5314-be14-df237901396f"
-version = "0.7.2"
+version = "0.8.1"
 
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -27,9 +33,9 @@ version = "0.5.3"
 
 [[BlockArrays]]
 deps = ["Base64", "LinearAlgebra", "SparseArrays", "Test"]
-git-tree-sha1 = "274280f8a1163553d2a5ff87770a490047147e55"
+git-tree-sha1 = "68a477c2f2ddbbe518dc31a42aaf2df38bdfd93c"
 uuid = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
-version = "0.6.0"
+version = "0.7.0"
 
 [[BlockBandedMatrices]]
 deps = ["BandedMatrices", "BlockArrays", "Distributed", "FillArrays", "LazyArrays", "LinearAlgebra", "Pkg", "Profile", "Random", "SharedArrays", "SparseArrays", "Statistics", "Test"]
@@ -51,7 +57,7 @@ version = "1.1.1"
 
 [[ContinuumArrays]]
 deps = ["BandedMatrices", "DomainSets", "FillArrays", "InfiniteArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Test"]
-git-tree-sha1 = "c2e4f24787c7d6c22201bcebcd695f8073d7d615"
+git-tree-sha1 = "616fe6d93ac6118f2b53d4e39ab372492ff45d58"
 repo-rev = "master"
 repo-url = "https://github.com/JuliaApproximation/ContinuumArrays.jl.git"
 uuid = "abb603bd-c6a4-5c0b-b5d0-50a836a7e82c"
@@ -103,13 +109,13 @@ version = "0.3.2"
 
 [[FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Test"]
-git-tree-sha1 = "d87b7fc5c086cf157deabec625d53ba55eca6436"
+git-tree-sha1 = "471b7e33dc9c9c5b9170045dd57c8ba0927b2918"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "0.3.0"
+version = "0.4.0"
 
 [[FiniteDifferencesQuasi]]
 deps = ["ContinuumArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Printf", "Test"]
-git-tree-sha1 = "f3ba3ff180ada790544043b8e4e13f3b95b8017d"
+git-tree-sha1 = "262a72786c25a99be49db3324e25c138b90dc377"
 repo-rev = "master"
 repo-url = "https://github.com/jagot/FiniteDifferencesQuasi.jl.git"
 uuid = "2e420920-f185-11e8-29af-4b87f0732ba2"
@@ -117,9 +123,9 @@ version = "0.1.0"
 
 [[InfiniteArrays]]
 deps = ["DSP", "FillArrays", "LazyArrays", "LinearAlgebra", "SparseArrays", "Statistics", "Test"]
-git-tree-sha1 = "e65228707f83519678abeb780ff0d53cebcc2584"
+git-tree-sha1 = "ceb060a732135d83d75f4b4059374d9d35e27b03"
 uuid = "4858937d-0d70-526a-a4dd-2d5cb5dd786c"
-version = "0.0.2"
+version = "0.0.3"
 
 [[InteractiveUtils]]
 deps = ["LinearAlgebra", "Markdown"]
@@ -133,9 +139,9 @@ version = "0.3.1"
 
 [[IterativeSolvers]]
 deps = ["LinearAlgebra", "Printf", "Random", "RecipesBase", "SparseArrays", "Test"]
-git-tree-sha1 = "57a6970c70224fd62b6ee0fa1f59da842cdce38c"
+git-tree-sha1 = "5687f68018b4f14c0da54d402bb23eecaec17f37"
 uuid = "42fd0dbc-a981-5370-80f2-aaf504508153"
-version = "0.8.0"
+version = "0.8.1"
 
 [[JSON]]
 deps = ["Dates", "Distributed", "Mmap", "Sockets", "Test", "Unicode"]
@@ -149,7 +155,7 @@ git-tree-sha1 = "282c4d8f504748fcf2530f1f34713c3581093ffc"
 repo-rev = "master"
 repo-url = "LazyArrays"
 uuid = "5078a376-72f3-5289-bfd5-ec5146d43c02"
-version = "0.5.0+"
+version = "0.5.1+"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -177,9 +183,9 @@ uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[Polynomials]]
 deps = ["LinearAlgebra", "SparseArrays", "Test"]
-git-tree-sha1 = "1a1eae52956658a6acae6fa1b6d6c3d488192895"
+git-tree-sha1 = "62142bd65d3f8aeb2226ec64dd8493349147df94"
 uuid = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
-version = "0.5.1"
+version = "0.5.2"
 
 [[Printf]]
 deps = ["Unicode"]
@@ -234,9 +240,9 @@ version = "0.7.2"
 
 [[StaticArrays]]
 deps = ["InteractiveUtils", "LinearAlgebra", "Random", "Statistics", "Test"]
-git-tree-sha1 = "97c4bf0f647488dd7ac01ea12be5885f88762938"
+git-tree-sha1 = "1eb114d6e23a817cd3e99abc3226190876d7c898"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "0.10.0"
+version = "0.10.2"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]

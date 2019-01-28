@@ -158,10 +158,11 @@ function (pp::PoissonProblem)(lazy_density=pp.uv; verbosity=0, io::IO=stdout, kw
     ii = 0
     for (iteration,item) in enumerate(iterable)
         iterable.mv_products += 1
-        verbosity > 1 && println("#$iteration: $(iterable.residual)")
+        verbosity > 1 && println(io, "#$iteration: $(iterable.residual)")
         ii += 1
     end
-    verbosity > 0 && println("Converged: ", IterativeSolvers.converged(iterable) ? "yes" : "no",
+    verbosity > 0 && println(io,
+                            "Poisson problem: Converged: ", IterativeSolvers.converged(iterable) ? "yes" : "no",
                             ", #iterations: ", ii, "/", iterable.maxiter,
                             ", residual: ", iterable.residual)
 

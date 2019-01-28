@@ -142,6 +142,7 @@ function reset_cg_iterator!(it::It) where {It<:Union{CGIterable,PCGIterable}}
     mul!(it.c, it.A, it.x)
     it.r .-= it.c
     it.residual = norm(it.r)
+    it.u .= 0
 end
 
 function (pp::PoissonProblem)(lazy_density=pp.uv; verbosity=0, io::IO=stdout, kwargs...)

@@ -79,9 +79,9 @@ function PoissonProblem(k::Int, u::RO₁, v::RO₁;
     prec = aspreconditioner(ruge_stuben(sparse(Tᵏ)))
     solver_iterable = cg_iterator!(yc, Tᵏ, ρ.mul.factors[2], prec; initially_zero=true, kwargs...)
     solver_iterable.reltol = sqrt(eps(real(eltype(w′c))))
-    pp = PoissonProblem(k, inv.(r), R*(r.^k), r.^(k+1), inv(r[end]^(2k+1)),
-                        Tᵏ, u .⋆ v, ρ, y, w′, solver_iterable)
-    pp
+
+    PoissonProblem(k, inv.(r), R*(r.^k), r.^(k+1), inv(r[end]^(2k+1)),
+                   Tᵏ, u .⋆ v, ρ, y, w′, solver_iterable)
 end
 
 #=
@@ -144,13 +144,13 @@ function reset_cg_iterator!(it::It) where {It<:Union{CGIterable,PCGIterable}}
     it.residual = norm(it.r)
 end
 
-function (pp::PoissonProblem)(; verbosity=0, kwargs...)
+function (pp::PoissonProblem)(lazy_density=pp.uv; verbosity=0, io::IO=stdout, kwargs...)
     k,ρ,r⁻¹ = pp.k,pp.ρ,pp.r⁻¹
     ρc = ρ.mul.factors[2]
     yc = pp.y.mul.factors[2]
     wc = pp.w′.mul.factors[2]
 
-    copyto!(ρ, pp.uv) # Form density
+    copyto!(ρ, lazy_density) # Form density
 
     iterable = pp.solve_iterable
     iterable.r .= (2k+1) * ρc .* r⁻¹
@@ -175,5 +175,10 @@ function (pp::PoissonProblem)(; verbosity=0, kwargs...)
 
     pp.w′
 end
+
+# For exchange potentials, where the density is formed in part from
+# the orbital which is "acted upon".
+(pp::PoissonProblem)(v::RO; kwargs...) where {RO<:RadialOrbital} =
+    pp(pp.uv.u .⋆ v; kwargs...)
 
 export PoissonProblem

@@ -180,7 +180,11 @@ end
 
 # For exchange potentials, where the density is formed in part from
 # the orbital which is "acted upon".
-(pp::PoissonProblem)(v::RO; kwargs...) where {RO<:RadialOrbital} =
-    pp(pp.uv.u .⋆ v; kwargs...)
+function (pp::PoissonProblem)(v::RO; kwargs...) where {RO<:RadialOrbital}
+    R,vc = v.mul.factors
+    pp.uv.R == R ||
+        throw(DimensionMismatch("Cannot form mutual density from different bases"))
+    pp((R*pp.uv.u) .⋆ v; kwargs...)
+end
 
 export PoissonProblem

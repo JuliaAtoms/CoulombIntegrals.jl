@@ -1,6 +1,6 @@
 #= Reference data from
-- Fischer, C. (1977). The hartree-fock method for atoms : a numerical
-  approach. New York: Wiley.
+- Fischer, C. (1977). The Hartree-Fock Method for Atoms : A Numerical
+  Approach. New York: Wiley.
 =#
 
 # Table 6.2

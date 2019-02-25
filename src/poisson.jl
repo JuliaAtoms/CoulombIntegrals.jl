@@ -1,14 +1,3 @@
-using FEDVRQuasi
-using FiniteDifferencesQuasi
-using LinearAlgebra
-using IterativeSolvers
-using AlgebraicMultigrid
-using SparseArrays
-import ContinuumArrays: axes
-import ContinuumArrays.QuasiArrays: AbstractQuasiMatrix, MulQuasiArray
-
-const RadialOrbital{T,B} = MulQuasiArray{T,1,<:Mul{<:Tuple, <:Tuple{B,<:AbstractVector}}}
-
 struct PoissonProblem{T,U,B<:AbstractQuasiMatrix,
                       V<:AbstractVector{U}, M<:AbstractMatrix, LD,
                       RV<:RadialOrbital{U,B},

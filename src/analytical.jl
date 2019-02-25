@@ -1,5 +1,3 @@
-using SpecialFunctions
-
 # a!/b!
 factorial_ratio(a::I, b::I) where {I<:Integer} = gamma(a+1)/gamma(b+1) #binomial(a,b)*factorial(a-b)
 

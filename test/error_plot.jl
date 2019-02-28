@@ -1,3 +1,8 @@
+if VERSION < v"1.1-DEV"
+    isnothing(::Nothing) = true
+    isnothing(::Any) = false
+end
+
 function error_plot(fun::Function, Ns::AbstractVector{<:Integer},
                     ρcol::Int,
                     errors::Vector{<:Tuple{Int,String,<:Real,<:Real}},

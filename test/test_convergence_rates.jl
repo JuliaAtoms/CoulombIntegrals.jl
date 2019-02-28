@@ -1,5 +1,10 @@
 using PrettyTables
 
+if VERSION < v"1.1-DEV"
+    isnothing(::Nothing) = true
+    isnothing(::Any) = false
+end
+
 function estimate_convergence_rate(ρ, ϵ)
     i = argmin(abs.(ϵ)) - 1
 

@@ -28,7 +28,7 @@ matrix:
 
 # uncomment the following lines to override the default test script
 script:
- - julia -e 'using Pkg; Pkg.activate(pwd()); pkg"instantiate"'
+ - julia -e 'using Pkg; Pkg.activate(pwd()); pkg"instantiate"; pkg"add https://github.com/jagot/OrthoPoly.jl.git"'
  - julia -e 'using Pkg; Pkg.build(); Pkg.test(coverage=true)'
 after_success:
   # push coverage results to Coveralls

@@ -2,8 +2,10 @@ struct PoissonProblem{T,U,B<:AbstractQuasiMatrix,
                       V<:AbstractVector{U},
                       M<:AbstractMatrix, LD,
                       RV<:RadialOrbital{U,B},
-                      RO₁<:RadialOrbital{T,B},RO₂<:RadialOrbital{T,B},
-                      Factorization<:LaplacianFactorization}
+                      RO₁<:RadialOrbital{T,B},
+                      RHS<:AbstractVector,
+                      RO₂<:RadialOrbital{T,B},
+                      Factorization}
     k::Int
     r⁻¹::V
     rᵏ::RV
@@ -12,6 +14,8 @@ struct PoissonProblem{T,U,B<:AbstractQuasiMatrix,
     Tᵏ::M # Laplacian
     uv::LD # Lazy mutual density
     ρ::RO₁ # Mutual density
+    rhs::RHS # Right-hand side of Poisson problem
+    y::RO₂ # Intermediate solution
     w′::RO₂ # Solution
     Tᵏ⁻¹::Factorization # Factorized Laplacian
 end
@@ -31,7 +35,7 @@ function get_double_laplacian(R::B,k::I) where {B<:AbstractQuasiMatrix,I<:Intege
     Tᵏ + V
 end
 
-LinearAlgebra.isposdef(T::Union{Tridiagonal,SymTridiagonal}) = isposdef(Matrix(T))
+# LinearAlgebra.isposdef(T::Union{Tridiagonal,SymTridiagonal}) = isposdef(Matrix(T))
 
 """
     PoissonProblem(k, u, v[; w′=similar(u), Tᵏ=get_double_laplacian(R,k)])
@@ -56,8 +60,13 @@ function PoissonProblem(k::Int, u::RO₁, v::RO₁;
     Ru == Rv || throw(DimensionMismatch("Incompatible bases"))
 
     ρ = similar(u)
+    rhs = similar(u.mul.factors[2])
 
-    Tᵏ⁻¹ = LaplacianFactorization(Tᵏ, ρ, w′; kwargs...)
+    y=similar(w′)
+    # Strong zero to get rid of random NaNs
+    y.mul.factors[2] .= false
+
+    Tᵏ⁻¹ = factorization(Tᵏ; kwargs...)
 
     R = w′.mul.factors[1]
     r = locs(R)
@@ -69,7 +78,7 @@ function PoissonProblem(k::Int, u::RO₁, v::RO₁;
 
     PoissonProblem(k, inv.(r),
                    R*(r.^k), r.^(k+1), inv(rₘₐₓ^(2k+1)),
-                   Tᵏ, u .⋆ v, ρ, w′, Tᵏ⁻¹)
+                   Tᵏ, u .⋆ v, ρ, rhs, y, w′, Tᵏ⁻¹)
 end
 
 #=
@@ -130,8 +139,11 @@ function (pp::PoissonProblem)(lazy_density=pp.uv; verbosity=0, io::IO=stdout, kw
     wc = pp.w′.mul.factors[2]
 
     copyto!(ρ, lazy_density) # Form density
-    pp.Tᵏ⁻¹.rhs .= (2k+1) * ρc .* r⁻¹
-    ldiv!(pp.Tᵏ⁻¹, pp.w′; io=io, kwargs...)
+    pp.rhs .= (2k+1) * ρc .* r⁻¹
+    ldiv!(pp.y.mul.factors[2], pp.Tᵏ⁻¹, pp.rhs)
+
+    copyto!(pp.w′.mul.factors[2],
+            pp.y.mul.factors[2])
 
     # Add in homogeneous contribution
     s = (ρ'pp.rᵏ)[1]*pp.rₘₐₓ⁻²ᵏ⁺¹

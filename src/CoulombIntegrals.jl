@@ -1,9 +1,7 @@
 module CoulombIntegrals
 
 using LinearAlgebra
-using IterativeSolvers
-using AlgebraicMultigrid
-using SparseArrays
+using MatrixFactorizations
 
 using LazyArrays
 import LazyArrays: ⋆, materialize
@@ -19,7 +17,6 @@ const RadialOrbital{T,B} = MulQuasiArray{T,1,<:Mul{<:Tuple, <:Tuple{B,<:Abstract
 
 include("analytical.jl")
 include("lazy-coulomb.jl")
-include("laplacian_factorization.jl")
 include("poisson.jl")
 
 end # module

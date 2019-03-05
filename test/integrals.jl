@@ -1,5 +1,3 @@
-import CoulombIntegrals: LaplacianFactorization, ConjugateGradient
-
 function get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode)
     u = get_orbitals(R, ℓ, Z, n-ℓ, orbital_mode)[end][2]
     v = get_orbitals(R, ℓ′, Z, n′-ℓ′, orbital_mode)[end][2]

@@ -4,15 +4,13 @@ authors = ["Stefanos Carlström <stefanos.carlstrom@gmail.com>"]
 version = "0.1.0"
 
 [deps]
-AlgebraicMultigrid = "2169fc97-5a83-5252-b627-83903c6c433c"
 ContinuumArrays = "abb603bd-c6a4-5c0b-b5d0-50a836a7e82c"
 FEDVRQuasi = "a2e24d02-e4f7-11e8-15c0-0b59d0e1f6f3"
 FiniteDifferencesQuasi = "2e420920-f185-11e8-29af-4b87f0732ba2"
-IterativeSolvers = "42fd0dbc-a981-5370-80f2-aaf504508153"
 LazyArrays = "5078a376-72f3-5289-bfd5-ec5146d43c02"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+MatrixFactorizations = "f1b39ad4-3e99-11e9-193e-b3ae8ec46476"
 Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
-SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 

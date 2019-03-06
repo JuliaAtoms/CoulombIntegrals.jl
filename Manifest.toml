@@ -117,7 +117,7 @@ version = "0.4.0"
 
 [[FiniteDifferencesQuasi]]
 deps = ["ContinuumArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Printf", "Test"]
-git-tree-sha1 = "5c0cf98d6d46d3c5f8759edaa2e59f8d1f7f8365"
+git-tree-sha1 = "1d66bb5f9c96be0ca1b02fec9bd1bca82a27477f"
 repo-rev = "master"
 repo-url = "https://github.com/jagot/FiniteDifferencesQuasi.jl.git"
 uuid = "2e420920-f185-11e8-29af-4b87f0732ba2"

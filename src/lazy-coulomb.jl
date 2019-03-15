@@ -26,58 +26,45 @@ end
 Base.replace_in_print_matrix(::LazyCoulomb, i::Integer, j::Integer, s::AbstractString) =
     i == j ? s : Base.replace_with_centered_mark(s)
 
-const CoulombIntegral{T,B} = Mul{<:Tuple,<:Tuple{<:Adjoint{T,<:AbstractVector},<:QuasiAdjoint{T,B},<:LazyCoulomb{T,B},<:B,<:AbstractVector}}
+const CoulombIntegral{T} = Mul{<:Any,<:Tuple{
+    Mul{<:Any, <:Tuple{
+        <:Adjoint{T,<:AbstractVector},
+        <:AbstractQuasiMatrix}},
+    <:LazyCoulomb{T,<:AbstractQuasiMatrix},
+    Mul{<:Any, <:Tuple{
+        <:AbstractQuasiMatrix,
+        <:AbstractVector}}}}
 
 K(ℓ::I,r::T,r̃::T) where {I<:Integer,T} = min(r,r̃)^ℓ/max(r,r̃)^(ℓ+1)
 
-locs(B::FEDVR) = B.x
-locs(B::AbstractFiniteDifferences) = FiniteDifferencesQuasi.locs(B)
-
-function weight!(d, i, B::FEDVR)
-    d[i,i] /= B.n[i]
-end
-function weight!(d, i, B::RadialDifferences)
-    d[i,i] *= B.ρ
-end
-function weight!(d, i, B::NumerovFiniteDifferences)
-    d[i,i] *= B.Δx
-end
-
-function Base.copyto!(dest::AbstractVector{T},
-                      M::Mul{<:Tuple,<:Tuple{<:Adjoint{<:Any,<:AbstractVector},
-                                             <:QuasiAdjoint{<:Any,<:Basis},
-                                             <:Basis,
-                                             <:AbstractMatrix,
-                                             <:QuasiAdjoint{<:Any,<:Basis},
-                                             <:Basis,
-                                             <:AbstractVector}}) where {T,Basis<:AbstractQuasiMatrix{T}}
-    axes(dest) == axes(M) || throw(DimensionMismatch("Incompatible axes"))
-    u,A,B,O,C,D,v = M.factors
-    A' == B == C' == D || throw(DimensionMismatch("Incompatible bases"))
-    dest[1,1] = u*O*v
-    dest
-end
-
-function Base.copyto!(dest::AbstractMatrix, M::CoulombIntegral{T,B}) where {T,B<:AbstractQuasiMatrix{T}}
-    u,R₁,LC,R₂,v = M.factors
-    @assert R₁' == R₂
-    R = R₂
+function Base.copyto!(dest::AbstractVector{T}, M::CoulombIntegral{T}) where T
+    u,LC,v = M.args
+    R = LC.R
     r = locs(R)
     k = Diagonal(similar(r))
-    k̂ = R⋆k⋆R'
-    ukv = u⋆R₁⋆k̂⋆R₂⋆v
+
+    Rv = R'v
+    tmp = similar(v)
+
+    tmp.args[2] .= 0
+
+    kv = k⋆Rv
+
     for i in eachindex(r)
         k.diag .= K.(LC.ℓ,r,r[i])
-        dest[i:i,i:i] .= ukv
-        weight!(dest, i, R)
+        tmp.args[2] .= kv
+        # u is already conjugated, hence we don't use the
+        # transposition operator to calculate the dot product.
+        dest[i:i] .= applied(*, u, tmp)
     end
+
     dest
 end
 
 function Base.similar(M::CoulombIntegral, ::Type{T}) where T
-    B = M.factors[4]
-    v = Vector{T}(undef, size(B,2))
-    Diagonal(v)
+    LC = M.args[2]
+    R = LC.R
+    Vector{T}(undef, size(R,2))
 end
 LazyArrays.materialize(M::CoulombIntegral) = copyto!(similar(M, eltype(M)), M)
 

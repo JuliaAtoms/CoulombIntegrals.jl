@@ -14,9 +14,9 @@ version = "0.2.1"
 
 [[BandedMatrices]]
 deps = ["FillArrays", "LazyArrays", "LinearAlgebra", "Random", "SparseArrays", "Test"]
-git-tree-sha1 = "3804222a671e7e4f697cc31b6639592ba8ae00ae"
+git-tree-sha1 = "ac5b244e729922c61f75c2e4478e13e8949b1f56"
 uuid = "aae01518-5342-5314-be14-df237901396f"
-version = "0.8.1"
+version = "0.8.2"
 
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -41,15 +41,15 @@ version = "0.7.0"
 
 [[BlockBandedMatrices]]
 deps = ["BandedMatrices", "BlockArrays", "Distributed", "FillArrays", "LazyArrays", "LinearAlgebra", "Pkg", "Profile", "Random", "SharedArrays", "SparseArrays", "Statistics", "Test"]
-git-tree-sha1 = "9afde8e994241a0d51fbea6eb2d5313ac4a6a944"
+git-tree-sha1 = "7e168e4074d1c3ce6c03cbd45d8fe81cadeb423a"
 uuid = "ffab5731-97b5-5995-9138-79e8c1846df0"
-version = "0.3.2"
+version = "0.3.3"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "49269e311ffe11ac5b334681d212329002a9832a"
+git-tree-sha1 = "195a3ffcb8b0762684b6821de18f83a16455c6ea"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "1.5.1"
+version = "2.0.0"
 
 [[Conda]]
 deps = ["Compat", "JSON", "VersionParsing"]
@@ -59,7 +59,7 @@ version = "1.2.0"
 
 [[ContinuumArrays]]
 deps = ["BandedMatrices", "DomainSets", "FillArrays", "InfiniteArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Test"]
-git-tree-sha1 = "616fe6d93ac6118f2b53d4e39ab372492ff45d58"
+git-tree-sha1 = "2ed9afee648c0ff77f0d517b06d736dcd2f59575"
 repo-rev = "master"
 repo-url = "https://github.com/JuliaApproximation/ContinuumArrays.jl.git"
 uuid = "abb603bd-c6a4-5c0b-b5d0-50a836a7e82c"
@@ -90,8 +90,8 @@ uuid = "5b8099bc-c8ec-5219-889f-1d9e522a28bf"
 version = "0.0.1"
 
 [[FEDVRQuasi]]
-deps = ["BlockBandedMatrices", "ContinuumArrays", "FastGaussQuadrature", "FillArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Printf", "Test"]
-git-tree-sha1 = "aaeda7e174bbd571c8f534822b36e28739f2e7ae"
+deps = ["BandedMatrices", "BlockBandedMatrices", "ContinuumArrays", "FastGaussQuadrature", "FillArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Printf", "Test"]
+git-tree-sha1 = "bdb1d46554684ceb7c144391fa3c8c6cef692af8"
 repo-rev = "master"
 repo-url = "https://github.com/jagot/FEDVRQuasi.jl.git"
 uuid = "a2e24d02-e4f7-11e8-15c0-0b59d0e1f6f3"
@@ -111,13 +111,13 @@ version = "0.3.2"
 
 [[FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Test"]
-git-tree-sha1 = "471b7e33dc9c9c5b9170045dd57c8ba0927b2918"
+git-tree-sha1 = "2def0123a4f3572234405b0e3d80bfe5d3e1a2a4"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "0.4.0"
+version = "0.5.0"
 
 [[FiniteDifferencesQuasi]]
 deps = ["ContinuumArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Printf", "Test"]
-git-tree-sha1 = "1d66bb5f9c96be0ca1b02fec9bd1bca82a27477f"
+git-tree-sha1 = "4357005125f74496b0cd05388a24594cd10e65a8"
 repo-rev = "master"
 repo-url = "https://github.com/jagot/FiniteDifferencesQuasi.jl.git"
 uuid = "2e420920-f185-11e8-29af-4b87f0732ba2"
@@ -153,9 +153,11 @@ version = "0.20.0"
 
 [[LazyArrays]]
 deps = ["FillArrays", "LinearAlgebra", "StaticArrays", "Test"]
-git-tree-sha1 = "804f03d3dab6954b0a4043d253366ccfa08b7b19"
+git-tree-sha1 = "39916bd54bddd2d99324f09f6d3895cde91420ec"
+repo-rev = "master"
+repo-url = "https://github.com/JuliaArrays/LazyArrays.jl.git"
 uuid = "5078a376-72f3-5289-bfd5-ec5146d43c02"
-version = "0.5.1"
+version = "0.6.0+"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -176,7 +178,7 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[MatrixFactorizations]]
 deps = ["AlgebraicMultigrid", "IterativeSolvers", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "11483b35cc610ebc2575c6dfc1bf00751cab86dc"
+git-tree-sha1 = "2bce6d8102a75e5b6c29b04c044cd9f6b19e5c14"
 repo-rev = "master"
 repo-url = "https://github.com/jagot/MatrixFactorizations.jl.git"
 uuid = "f1b39ad4-3e99-11e9-193e-b3ae8ec46476"

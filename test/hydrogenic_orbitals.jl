@@ -1,6 +1,8 @@
 using LinearAlgebra
 using ArnoldiMethod
 import ContinuumArrays.QuasiArrays: AbstractQuasiMatrix
+using LazyArrays
+import LazyArrays: ⋆
 
 using Polynomials
 using OrthoPoly
@@ -56,10 +58,10 @@ function get_orbitals(R::B, ℓ::Int, Z, nev::Int,
         println(history)
         println(diag(schur.R))
 
-        [(n+ℓ,ℓ) => normalize!(R*(schur.Q[:,n]*sign(schur.Q[1,n]))) for n = 1:nev]
+        [(n+ℓ,ℓ) => normalize!(R ⋆ (schur.Q[:,n]*sign(schur.Q[1,n]))) for n = 1:nev]
     elseif mode == :symbolic
         r = CoulombIntegrals.locs(R)
-        [(n,ℓ) => R*hydredwfn(n,ℓ,Z).(r)
+        [(n,ℓ) => R ⋆ dot(R,hydredwfn(n,ℓ,Z))
          for n ∈ ℓ .+ (1:nev)]
     else
         throw(ArgumentError("Unknown mode $(mode)"))

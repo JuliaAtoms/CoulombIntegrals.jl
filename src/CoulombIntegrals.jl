@@ -6,14 +6,18 @@ using MatrixFactorizations
 using LazyArrays
 import LazyArrays: ⋆, materialize
 import ContinuumArrays: axes
-import ContinuumArrays.QuasiArrays: AbstractQuasiMatrix, MulQuasiArray, QuasiAdjoint
+import ContinuumArrays.QuasiArrays: AbstractQuasiArray, AbstractQuasiMatrix, MulQuasiArray, QuasiAdjoint
+using IntervalSets
 
 using FEDVRQuasi
 using FiniteDifferencesQuasi
 
 using SpecialFunctions
 
-const RadialOrbital{T,B} = MulQuasiArray{T,1,<:Mul{<:Tuple, <:Tuple{B,<:AbstractVector}}}
+const RadialOrbital{T,B<:AbstractQuasiMatrix} = Mul{<:Any, <:Tuple{B,<:AbstractVector{T}}}
+
+locs(B::FEDVRQuasi.FEDVROrRestricted) = FEDVRQuasi.locs(B)
+locs(B::AbstractFiniteDifferences) = FiniteDifferencesQuasi.locs(B)
 
 include("analytical.jl")
 include("lazy-coulomb.jl")

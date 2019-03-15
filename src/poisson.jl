@@ -28,7 +28,7 @@ basis `R`, `-∂ᵣ² + k(k+1)/r²`.
 """
 function get_double_laplacian(R::B,k::I) where {B<:AbstractQuasiMatrix,I<:Integer}
     D = Derivative(axes(R,1))
-    Tᵏ = R'D'D*R
+    Tᵏ = R' * D' * D * R
     r = locs(R)
     Tᵏ *= -1
     V = Matrix(r -> k*(k+1)/r^2, R) # Is this correct for any basis? E.g. banded in B-splines?
@@ -49,35 +49,32 @@ but with different orbitals `u` and/or `v`.
 """
 function PoissonProblem(k::Int, u::RO₁, v::RO₁;
                         w′::RO₂=similar(u),
-                        Tᵏ::M = get_double_laplacian(u.mul.factors[1],k),
+                        Tᵏ::M = get_double_laplacian(u.args[1],k),
                         kwargs...) where {T,B<:AbstractQuasiMatrix,
                                           RO₁<:RadialOrbital{T,B},
                                           RO₂<:RadialOrbital{T,B},
                                           M<:AbstractMatrix}
     axes(u) == axes(v) || throw(DimensionMismatch("Incompatible axes"))
-    Ru,cu = u.mul.factors
-    Rv,cv = v.mul.factors
+    Ru,cu = u.args
+    Rv,cv = v.args
     Ru == Rv || throw(DimensionMismatch("Incompatible bases"))
 
     ρ = similar(u)
-    rhs = similar(u.mul.factors[2])
+    rhs = similar(u.args[2])
 
     y=similar(w′)
     # Strong zero to get rid of random NaNs
-    y.mul.factors[2] .= false
+    y.args[2] .= false
 
     Tᵏ⁻¹ = factorization(Tᵏ; kwargs...)
 
-    R = w′.mul.factors[1]
+    R = w′.args[1]
     r = locs(R)
 
-    # # This is how we'd ideally write it, to be basis-agnostic:
-    # rₘₐₓ = righendpoint(axes(R,1))
-    Δr = r[end]-r[end-1]
-    rₘₐₓ = r[end] + Δr
+    rₘₐₓ = rightendpoint(axes(R,1).domain)
 
     PoissonProblem(k, inv.(r),
-                   R*(r.^k), r.^(k+1), inv(rₘₐₓ^(2k+1)),
+                   R ⋆ (R ⋅ r -> r^k), R ⋅ r -> r^(k+1), inv(rₘₐₓ^(2k+1)),
                    Tᵏ, u .⋆ v, ρ, rhs, y, w′, Tᵏ⁻¹)
 end
 
@@ -120,14 +117,14 @@ r \to \infty.
 
 References:
 
-- Fischer, C. F., & Guo, W. (1990). Spline algorithms for the
-  Hartree-Fock equation for the helium ground state. Journal of
+- Fischer, C. F., & Guo, W. (1990). Spline Algorithms for the
+  Hartree-Fock Equation for the Helium Ground State. Journal of
   Computational Physics, 90(2),
   486–496. http://dx.doi.org/10.1016/0021-9991(90)90176-2
 
 - McCurdy, C. W., Baertschy, M., & Rescigno, T. N. (2004). Solving the
-  three-body Coulomb breakup problem using exterior complex
-  scaling. Journal of Physics B: Atomic, Molecular and Optical
+  Three-Body Coulomb Breakup Problem Using Exterior Complex
+  Scaling. Journal of Physics B: Atomic, Molecular and Optical
   Physics, 37(17),
   137–187. http://dx.doi.org/10.1088/0953-4075/37/17/r01
 
@@ -135,18 +132,17 @@ References:
 
 function (pp::PoissonProblem)(lazy_density=pp.uv; verbosity=0, io::IO=stdout, kwargs...)
     k,ρ,r⁻¹ = pp.k,pp.ρ,pp.r⁻¹
-    ρc = ρ.mul.factors[2]
-    wc = pp.w′.mul.factors[2]
+    ρc = ρ.args[2]
+    wc = pp.w′.args[2]
 
     copyto!(ρ, lazy_density) # Form density
     pp.rhs .= (2k+1) * ρc .* r⁻¹
-    ldiv!(pp.y.mul.factors[2], pp.Tᵏ⁻¹, pp.rhs)
+    ldiv!(pp.y.args[2], pp.Tᵏ⁻¹, pp.rhs)
 
-    copyto!(pp.w′.mul.factors[2],
-            pp.y.mul.factors[2])
+    copyto!(pp.w′.args[2], pp.y.args[2])
 
     # Add in homogeneous contribution
-    s = (ρ'pp.rᵏ)[1]*pp.rₘₐₓ⁻²ᵏ⁺¹
+    s = materialize(applied(*, ρ', pp.rᵏ))*pp.rₘₐₓ⁻²ᵏ⁺¹
     wc .+= s*pp.rᵏ⁺¹
 
     wc .*= r⁻¹
@@ -157,7 +153,7 @@ end
 # For exchange potentials, where the density is formed in part from
 # the orbital which is "acted upon".
 function (pp::PoissonProblem)(v::RO; kwargs...) where {RO<:RadialOrbital}
-    R,vc = v.mul.factors
+    R,vc = v.args
     pp.uv.R == R ||
         throw(DimensionMismatch("Cannot form mutual density from different bases"))
     pp((R*pp.uv.u) .⋆ v; kwargs...)

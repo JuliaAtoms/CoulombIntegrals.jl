@@ -7,6 +7,7 @@ end
 
 function estimate_convergence_rate(ρ, ϵ)
     i = argmin(abs.(ϵ)) - 1
+    i == 0 && return 0
 
     ([log10.(ρ[1:i]) ones(i)] \ log10.(abs.(ϵ[1:i])))[1]
 end

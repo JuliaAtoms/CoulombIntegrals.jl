@@ -1,10 +1,10 @@
-function get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode)
+function get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode; kwargs...)
     u = get_orbitals(R, ℓ, Z, n-ℓ, orbital_mode)[end][2]
     v = get_orbitals(R, ℓ′, Z, n′-ℓ′, orbital_mode)[end][2]
     r = CoulombIntegrals.locs(R)
     if coulomb_mode ∈ [:poisson,:poisson_cg]
         # TODO: Enforce conjugate-gradient when `:poisson_cg`
-        Π = PoissonProblem(k, u, v)
+        Π = PoissonProblem(k, u, v, kwargs...)
         Π(verbosity=0)
         if coulomb_mode == :poisson_cg
             @test Π.solve_iterable.mv_products < 10
@@ -14,8 +14,8 @@ function get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode)
         (R'Π.w′).*r
     elseif coulomb_mode == :direct
         LCk = LazyCoulomb(R,k)
-        M = u'LCk*v
-        w = diag(M) .* r
+        M = materialize(applied(*,u',LCk,v))
+        w = M .* r
     else
         throw(ArgumentError("Unknown coulomb_mode $(coulomb_mode)"))
     end

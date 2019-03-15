@@ -21,8 +21,8 @@ include("test_convergence_rates.jl")
     Zs = 1:3
 
     Rs = [(rₘₐₓ,N,Z) -> begin
-          ρ = rₘₐₓ/(N - 1/2)
-          (RadialDifferences(N, ρ, Z), ρ)
+          R = RadialDifferences(rₘₐₓ,N,Z)
+          R,step(R)
           end]
 
 

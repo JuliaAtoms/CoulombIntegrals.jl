@@ -17,8 +17,11 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [extras]
 ArnoldiMethod = "ec485272-7323-5ecc-a04f-4719b315124d"
+Clustering = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
 OrthoPoly = "ac483fec-2b7d-5cc8-8517-3a560514e1d5"
 PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+RollingFunctions = "b0e4dd01-7b14-53d8-9b45-175a3e362653"
 
 [targets]
-test = ["ArnoldiMethod", "OrthoPoly", "PrettyTables"]
+test = ["ArnoldiMethod", "Clustering", "OrthoPoly", "PrettyTables", "ProgressMeter", "RollingFunctions"]

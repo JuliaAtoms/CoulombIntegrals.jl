@@ -73,8 +73,14 @@ function PoissonProblem(k::Int, u::RO₁, v::RO₁;
 
     rₘₐₓ = rightendpoint(axes(R,1).domain)
 
+    r = locs(R)
+    # Vandermonde matrix for interpolating functions
+    RV = R[r,:]
+    rᵏ = RV \ r.^k
+    rᵏ⁺¹ = RV \ r.^(k+1)
+
     PoissonProblem(k, inv.(r),
-                   R ⋆ (R ⋅ r -> r^k), R ⋅ r -> r^(k+1), inv(rₘₐₓ^(2k+1)),
+                   R ⋆ rᵏ, rᵏ⁺¹, inv(rₘₐₓ^(2k+1)),
                    Tᵏ, u .⋆ v, ρ, rhs, y, w′, Tᵏ⁻¹)
 end
 

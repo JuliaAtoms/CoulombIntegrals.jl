@@ -55,7 +55,8 @@ function Yᵏ_error(R, ρ, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mod
     t = time()
     Yᵏ = get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode)
     el = time()-t
-    Ỹᵏ = exact_Yᵏs[((n,ℓ),(n′,ℓ′),k)].(Z*r)
+    RV = R[r,:]
+    Ỹᵏ = RV \ exact_Yᵏs[((n,ℓ),(n′,ℓ′),k)].(Z*r)
 
     dYᵏ = Yᵏ - Ỹᵏ
     lδ = maximum(abs, dYᵏ)

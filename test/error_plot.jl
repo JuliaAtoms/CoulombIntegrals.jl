@@ -9,45 +9,41 @@ function error_plot(fun::Function, Ns::AbstractVector{<:Integer},
                     elapsed_col::Int,
                     headers::Vector{String},
                     other_vectors::AbstractVector...;
+                    sa = subplot(311),
+                    sb = subplot(312),
+                    sc = subplot(313),
                     kwargs...)
-    sa = subplot(211)
-    sb = subplot(212)
-
-    numchoices = prod(length.(other_vectors))
-
     plot_fun = (i,data) -> begin
         ρ = data[:,ρcol]
-        
-        sca(sa)
+
         line = nothing
         for ((ecol,elabel,_,_),style) in zip(errors,Iterators.cycle(["-", ":", "--"]))
+            sca(sa)
             line = loglog(ρ,abs.(data[:,ecol]), "s$style",
-                          color = !isnothing(line) ? line[:get_color]() : nothing)[1]
+                          color = !isnothing(line) ? line.get_color() : nothing)[1]
+            sca(sc)
+            loglog(abs.(data[:,ecol]),data[:,elapsed_col], "s$style",
+                   color = !isnothing(line) ? line.get_color() : nothing)
         end
 
         sca(sb)
         loglog(ρ,data[:,elapsed_col],"s-")
-
-        if i == numchoices
-            sca(sa)
-            for p in 1:4
-                yp = ρ.^p
-                loglog(ρ, yp  * data[end,errors[1][1]]/yp[end]
-                       , ":",
-                       label=latexstring("\$p=$p\$"))
-            end
-        end        
     end
 
     result = test_convergence_rates(fun, Ns, ρcol, errors, headers, other_vectors...;
                                     plot_fun=plot_fun, kwargs...)
 
     sca(sa)
-    no_tick_labels()
+    axes_labels_opposite(:x)
     ylabel("Error")
+    xlabel(L"\rho")
 
     sca(sb)
-    xlabel(L"\rho")
+    no_tick_labels()
+    ylabel("Elapsed time [s]")
+
+    sca(sc)
+    xlabel("Error")
     ylabel("Elapsed time [s]")
     tight_layout()
 

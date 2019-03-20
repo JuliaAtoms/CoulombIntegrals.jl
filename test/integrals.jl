@@ -25,16 +25,19 @@ function get_Fᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode)
     u = get_orbitals(R, ℓ, Z, n-ℓ, orbital_mode)[end][2]
     v = get_orbitals(R, ℓ′, Z, n′-ℓ′, orbital_mode)[end][2]
     r = CoulombIntegrals.locs(R)
-    
+
     # The F integrals are symmetric, and thus which orbital is used to
     # form the Yᵏ potential should not matter.
     Yᵏ = get_Yᵏ(R,k,n,ℓ,n,ℓ,Z,orbital_mode,coulomb_mode)
     Yᵏ′ = get_Yᵏ(R,k,n′,ℓ′,n′,ℓ′,Z,orbital_mode,coulomb_mode)
 
+    uu = materialize(u)
+    vv = materialize(v)
+
     # Perform the integral over the other coordinate.
-    Fᵏ = (v.*v)'*R*(Yᵏ./r)
-    Fᵏ′ = (u.*u)'*R*(Yᵏ′./r)
-    
+    Fᵏ = (vv.*vv)'*(R*(Yᵏ./r))
+    Fᵏ′ = (uu.*uu)'*(R*(Yᵏ′./r))
+
     Fᵏ,Fᵏ′
 end
 
@@ -42,10 +45,13 @@ function get_Gᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode)
     u = get_orbitals(R, ℓ, Z, n-ℓ, orbital_mode)[end][2]
     v = get_orbitals(R, ℓ′, Z, n′-ℓ′, orbital_mode)[end][2]
     r = CoulombIntegrals.locs(R)
-    
+
     Yᵏ = get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode)
-    
-    Gᵏ = (u.*v)'*R*(Yᵏ./r)
+
+    uu = materialize(u)
+    vv = materialize(v)
+
+    Gᵏ = (uu.*vv)'*(R*(Yᵏ./r))
 end
 
 function Yᵏ_error(R, ρ, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mode)
@@ -64,10 +70,10 @@ function Yᵏ_error(R, ρ, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mod
     # magnitudes of the local errors, decreases the order of
     # convergence by 1.
     gδ = sum(abs, dYᵏ)
-    
+
     a = (n,ℓ)
     b = (n′,ℓ′)
-    
+
     [N ρ orb_label(a) orb_label(b) k lδ gδ el]
 end
 

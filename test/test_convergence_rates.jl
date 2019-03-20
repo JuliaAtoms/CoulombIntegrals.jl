@@ -1,5 +1,4 @@
 using PrettyTables
-using Statistics
 using ProgressMeter
 
 using RollingFunctions
@@ -19,7 +18,7 @@ function estimate_convergence_rate(ρ, ϵ)
     # Find all slopes for consecutive groups of three errors
     slopes = rolling(f, x, y, 3)
     e = findfirst(s -> s < 0, slopes)
-    if e !== nothing
+    if e !== nothing && e > 5
         slopes = slopes[1:max(1,e-1)]
     end
 
@@ -65,7 +64,7 @@ function test_convergence_rates(fun::Function, Ns::AbstractVector{<:Integer},
             Any[minerr γ pass] # Without Any, pass will be coerced to Float64
         end |> e -> hcat(label, e...)
 
-        ProgressMeter.next!(progress)
+        verbosity > 1 || ProgressMeter.next!(progress)
 
         e
     end |> e -> vcat(filter(!isnothing, e)...)

@@ -93,7 +93,7 @@ version = "0.0.1"
 
 [[FEDVRQuasi]]
 deps = ["BandedMatrices", "BlockBandedMatrices", "ContinuumArrays", "FastGaussQuadrature", "FillArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Printf", "Test"]
-git-tree-sha1 = "2bd94ddc0107e97f6fc4bf5fefa9220678cdcbd1"
+git-tree-sha1 = "51d65de29b70523f34dde47c0a95972a3ed0150b"
 repo-rev = "master"
 repo-url = "https://github.com/jagot/FEDVRQuasi.jl.git"
 uuid = "a2e24d02-e4f7-11e8-15c0-0b59d0e1f6f3"
@@ -119,7 +119,7 @@ version = "0.5.0"
 
 [[FiniteDifferencesQuasi]]
 deps = ["ContinuumArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Printf", "Test"]
-git-tree-sha1 = "ed2da1d4491fe8ad23d694353ebc61f19f63d9d2"
+git-tree-sha1 = "b36d9577116f754c1a77dc253cadd1d66b1ddb5c"
 repo-rev = "master"
 repo-url = "https://github.com/jagot/FiniteDifferencesQuasi.jl.git"
 uuid = "2e420920-f185-11e8-29af-4b87f0732ba2"
@@ -155,11 +155,9 @@ version = "0.20.0"
 
 [[LazyArrays]]
 deps = ["FillArrays", "LinearAlgebra", "StaticArrays", "Test"]
-git-tree-sha1 = "5e65ca3ab05ae82e441fa51e9e91fb3fca1e7bb5"
-repo-rev = "master"
-repo-url = "https://github.com/JuliaArrays/LazyArrays.jl.git"
+git-tree-sha1 = "737472254720be95800f859a7c2aaf62488fd53f"
 uuid = "5078a376-72f3-5289-bfd5-ec5146d43c02"
-version = "0.6.0+"
+version = "0.7.1"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"

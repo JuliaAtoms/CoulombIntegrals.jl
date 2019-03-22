@@ -162,7 +162,7 @@ function (pp::PoissonProblem)(v::RO; kwargs...) where {RO<:RadialOrbital}
     R,vc = v.args
     pp.uv.R == R ||
         throw(DimensionMismatch("Cannot form mutual density from different bases"))
-    pp((R*pp.uv.u) .⋆ v; kwargs...)
+    pp(applied(*, R, pp.uv.u) .⋆ v; kwargs...)
 end
 
 export PoissonProblem

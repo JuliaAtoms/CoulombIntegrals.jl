@@ -63,6 +63,8 @@ function Yᵏ_error(R, ρ, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mod
     el = time()-t
     RV = R[r,:]
     Ỹᵏ = RV \ exact_Yᵏs[((n,ℓ),(n′,ℓ′),k)].(Z*r)
+    # Ugly work-around
+    CoulombIntegrals.weightit!(applied(*, R, Ỹᵏ))
 
     dYᵏ = Yᵏ - Ỹᵏ
     lδ = maximum(abs, dYᵏ)

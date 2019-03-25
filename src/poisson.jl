@@ -76,10 +76,11 @@ function PoissonProblem(k::Int, u::RO₁, v::RO₁;
     r = locs(R)
     # Vandermonde matrix for interpolating functions
     RV = R[r,:]
+    r⁻¹ = inv.(r)
     rᵏ = RV \ r.^k
     rᵏ⁺¹ = RV \ r.^(k+1)
 
-    PoissonProblem(k, inv.(r),
+    PoissonProblem(k, r⁻¹,
                    R ⋆ rᵏ, rᵏ⁺¹, inv(rₘₐₓ^(2k+1)),
                    Tᵏ, u .⋆ v, ρ, rhs, y, w′, Tᵏ⁻¹)
 end
@@ -136,22 +137,37 @@ References:
 
 =#
 
+# Ugly work-around until Poisson problem is properly expressed in a
+# basis-agnostic way.
+function weightit!(w::RadialOrbital{T,B}) where {T,B<:FEDVRQuasi.BasisOrRestricted{<:FEDVR}}
+    R,wc = w.args
+    R′ = FEDVRQuasi.unrestricted_basis(R)
+    a,b = FEDVRQuasi.restriction_extents(R)
+    wc .*= R′.n[1+a:end-b]
+    w
+end
+weightit!(w::RadialOrbital) = w
+
 function (pp::PoissonProblem)(lazy_density=pp.uv; verbosity=0, io::IO=stdout, kwargs...)
     k,ρ,r⁻¹ = pp.k,pp.ρ,pp.r⁻¹
-    ρc = ρ.args[2]
+    R,ρc = ρ.args
     wc = pp.w′.args[2]
+    yc = pp.y.args[2]
 
     copyto!(ρ, lazy_density) # Form density
-    pp.rhs .= (2k+1) * ρc .* r⁻¹
-    ldiv!(pp.y.args[2], pp.Tᵏ⁻¹, pp.rhs)
 
-    copyto!(pp.w′.args[2], pp.y.args[2])
+    pp.rhs .= (2k+1) * ρc .* r⁻¹
+    ldiv!(yc, pp.Tᵏ⁻¹, pp.rhs)
+
+    copyto!(wc, yc)
 
     # Add in homogeneous contribution
     s = materialize(applied(*, ρ', pp.rᵏ))*pp.rₘₐₓ⁻²ᵏ⁺¹
     wc .+= s*pp.rᵏ⁺¹
 
     wc .*= r⁻¹
+
+    weightit!(pp.w′)
 
     pp.w′
 end

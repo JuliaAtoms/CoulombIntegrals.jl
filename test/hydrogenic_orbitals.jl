@@ -61,7 +61,7 @@ function get_orbitals(R::B, ℓ::Int, Z, nev::Int,
         [(n+ℓ,ℓ) => normalize!(R ⋆ (schur.Q[:,n]*sign(schur.Q[1,n]))) for n = 1:nev]
     elseif mode == :symbolic
         r = CoulombIntegrals.locs(R)
-        [(n,ℓ) => R ⋆ dot(R,hydredwfn(n,ℓ,Z))
+        [(n,ℓ) => R ⋆ (R\hydredwfn(n,ℓ,Z))
          for n ∈ ℓ .+ (1:nev)]
     else
         throw(ArgumentError("Unknown mode $(mode)"))

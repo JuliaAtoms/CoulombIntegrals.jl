@@ -1,7 +1,7 @@
 module CoulombIntegrals
 
 using LinearAlgebra
-using MatrixFactorizations
+using IterativeFactorizations
 
 using LazyArrays
 import LazyArrays: ⋆, materialize

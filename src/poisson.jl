@@ -26,13 +26,14 @@ end
 Return Laplacian (multiplied by `2`) for partial wave `k` of the
 basis `R`, `-∂ᵣ² + k(k+1)/r²`.
 """
-function get_double_laplacian(R::B,k::I) where {B<:AbstractQuasiMatrix,I<:Integer}
+function get_double_laplacian(R::B,k::I,::Type{T}) where {B<:AbstractQuasiMatrix,I<:Integer,T}
     D = Derivative(axes(R,1))
     Tᵏ = R' * D' * D * R
     r = locs(R)
     Tᵏ *= -1
     V = Matrix(r -> k*(k+1)/r^2, R) # Is this correct for any basis? E.g. banded in B-splines?
-    Tᵏ + V
+    Tᵏ += V
+    isreal(T) ? Tᵏ : complex(Tᵏ)
 end
 
 # LinearAlgebra.isposdef(T::Union{Tridiagonal,SymTridiagonal}) = isposdef(Matrix(T))
@@ -49,7 +50,7 @@ but with different orbitals `u` and/or `v`.
 """
 function PoissonProblem(k::Int, u::RO₁, v::RO₁;
                         w′::RO₂=similar(u),
-                        Tᵏ::M = get_double_laplacian(u.args[1],k),
+                        Tᵏ::M = get_double_laplacian(u.args[1],k,T),
                         kwargs...) where {T,B<:AbstractQuasiMatrix,
                                           RO₁<:RadialOrbital{T,B},
                                           RO₂<:RadialOrbital{T,B},

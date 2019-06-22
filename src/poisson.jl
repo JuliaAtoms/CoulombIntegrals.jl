@@ -253,4 +253,4 @@ function (app::AsymptoticPoissonProblem)(lazy_density; kwargs...)
     app.w′
 end
 
-export PoissonProblem, AsymptoticPoissonProblem
+export AbstractPoissonProblem, PoissonProblem, AsymptoticPoissonProblem

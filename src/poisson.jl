@@ -245,10 +245,14 @@ function (app::AsymptoticPoissonProblem)(lazy_density; kwargs...)
     v = applied(*, app.R̃, view(lazy_density.v, app.inner))
     app.pp(u .⋆ v)
 
-    # Copy over asymptotic solution and weight it by the charge
-    # density within the inner region.
-    copyto!(app.w′tail, app.w̃)
-    lmul!(app.pp.∫ρ, app.w′tail)
+    # This is useful for the case we the asymptotic tail is not
+    # actually needed, e.g. when applied to an orbital of compact
+    # support.
+    if !isempty(app.w̃)
+        # Copy over asymptotic solution and weight it by the charge
+        # density within the inner region.
+        app.w′tail .= app.pp.∫ρ .* app.w̃
+    end
 
     app.w′
 end

@@ -11,7 +11,7 @@ function get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode; kwargs...)
             Π()
             @test Π.solve_iterable.mv_products == 1
         end
-        (R'Π.w′).*r
+        Π.w′.args[2].*r
     elseif coulomb_mode == :direct
         LCk = LazyCoulomb(R,k)
         M = materialize(applied(*,u',LCk,v))

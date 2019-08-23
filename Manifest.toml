@@ -13,10 +13,10 @@ uuid = "2169fc97-5a83-5252-b627-83903c6c433c"
 version = "0.2.2"
 
 [[BandedMatrices]]
-deps = ["FillArrays", "LazyArrays", "LinearAlgebra", "MatrixFactorizations", "Random", "SparseArrays", "Test"]
-git-tree-sha1 = "b4693af0992d443010df2ac35dbf8e67f27640ff"
+deps = ["FillArrays", "LazyArrays", "LinearAlgebra", "MatrixFactorizations", "Random", "SparseArrays"]
+git-tree-sha1 = "cdda54b29a1c52fa33defc0c61e3b8bb61f73d15"
 uuid = "aae01518-5342-5314-be14-df237901396f"
-version = "0.9.1"
+version = "0.10.1"
 
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -28,28 +28,28 @@ uuid = "9e28174c-4ba2-5203-b857-d8d62c4213ee"
 version = "0.8.10"
 
 [[BinaryProvider]]
-deps = ["Libdl", "SHA"]
+deps = ["Libdl", "Logging", "SHA"]
 git-tree-sha1 = "c7361ce8a2129f20b0e05a89f7070820cfed6648"
 uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
-version = "0.5.4"
+version = "0.5.6"
 
 [[BlockArrays]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "1c488d0cd6672e74abfb7fa212b7a8017ac07a17"
+git-tree-sha1 = "a36887ddaaf66b8f5bd017871f239247aa6f459f"
 uuid = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
-version = "0.9.0"
+version = "0.9.1"
 
 [[BlockBandedMatrices]]
 deps = ["BandedMatrices", "BlockArrays", "Distributed", "FillArrays", "LazyArrays", "LinearAlgebra", "MatrixFactorizations", "Pkg", "Profile", "Random", "SharedArrays", "SparseArrays", "Statistics", "Test"]
-git-tree-sha1 = "717511ea2e25e687e447a28ee0cfe3e50316955a"
+git-tree-sha1 = "52a3f347579a93ca4131ec2f6fd298ffde0deccb"
 uuid = "ffab5731-97b5-5995-9138-79e8c1846df0"
-version = "0.4.3"
+version = "0.4.6"
 
 [[CSTParser]]
-deps = ["LibGit2", "Test", "Tokenize"]
-git-tree-sha1 = "437c93bc191cd55957b3f8dee7794b6131997c56"
+deps = ["Tokenize"]
+git-tree-sha1 = "c69698c3d4a7255bc1b4bc2afc09f59db910243b"
 uuid = "00ebfdb7-1f24-5e51-bd34-a7502290713f"
-version = "0.5.2"
+version = "0.6.2"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
@@ -58,30 +58,30 @@ uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
 version = "2.1.0"
 
 [[Conda]]
-deps = ["Compat", "JSON", "VersionParsing"]
-git-tree-sha1 = "b625d802587c2150c279a40a646fba63f9bd8187"
+deps = ["JSON", "VersionParsing"]
+git-tree-sha1 = "9a11d428dcdc425072af4aea19ab1e8c3e01c032"
 uuid = "8f4d0f93-b110-5947-807f-2305c1781a2d"
-version = "1.2.0"
+version = "1.3.0"
 
 [[ContinuumArrays]]
-deps = ["BandedMatrices", "DomainSets", "FillArrays", "InfiniteArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Test"]
-git-tree-sha1 = "54e03a1567e0c441c55f990bab90e5e5f6f0a91e"
+deps = ["BandedMatrices", "ContinuumArrays", "DomainSets", "FillArrays", "InfiniteArrays", "InfiniteLinearAlgebra", "IntervalSets", "LazyArrays", "LinearAlgebra", "QuasiArrays"]
+git-tree-sha1 = "6b8d1678f04c4bcffa1eeb882ff85600dcb4eade"
 repo-rev = "master"
 repo-url = "https://github.com/JuliaApproximation/ContinuumArrays.jl.git"
-uuid = "abb603bd-c6a4-5c0b-b5d0-50a836a7e82c"
+uuid = "7ae1f121-cc2c-504b-ac30-9b923412ae5c"
 version = "0.0.0"
 
 [[DSP]]
-deps = ["AbstractFFTs", "Compat", "FFTW", "LinearAlgebra", "Polynomials", "Random", "Reexport", "SpecialFunctions"]
-git-tree-sha1 = "5ec38ebc4ddf6320ad50b826eb8fd7fb521993a5"
+deps = ["FFTW", "LinearAlgebra", "Polynomials", "Random", "Reexport", "SpecialFunctions", "Statistics"]
+git-tree-sha1 = "fd5dc811fc47f8c31274712d887c466bea0841c8"
 uuid = "717857b8-e6f2-59f4-9121-6e50c889abd2"
-version = "0.5.2"
+version = "0.6.0"
 
 [[DataStructures]]
-deps = ["InteractiveUtils", "OrderedCollections", "Random", "Serialization", "Test"]
-git-tree-sha1 = "ca971f03e146cf144a9e2f2ce59674f5bf0e8038"
+deps = ["InteractiveUtils", "OrderedCollections"]
+git-tree-sha1 = "0809951a1774dc724da22d26e4289bbaab77809a"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.15.0"
+version = "0.17.0"
 
 [[Dates]]
 deps = ["Printf"]
@@ -97,23 +97,23 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[DomainSets]]
 deps = ["IntervalSets", "LinearAlgebra", "StaticArrays", "Statistics", "Test"]
-git-tree-sha1 = "8172e0bf793c497fd23990281a800379000182bc"
+git-tree-sha1 = "591ad14ca2c777b07463b6bde3afb2bfe852e1be"
 uuid = "5b8099bc-c8ec-5219-889f-1d9e522a28bf"
-version = "0.0.2"
+version = "0.1.0"
 
 [[FEDVRQuasi]]
-deps = ["BandedMatrices", "BlockBandedMatrices", "ContinuumArrays", "FastGaussQuadrature", "FillArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Printf", "Test"]
-git-tree-sha1 = "44ce998bc862097eaf64dc82a4dd4d420ff79c15"
-repo-rev = "master"
+deps = ["BandedMatrices", "BlockBandedMatrices", "ContinuumArrays", "FastGaussQuadrature", "FillArrays", "InfiniteLinearAlgebra", "IntervalSets", "LazyArrays", "LinearAlgebra", "Printf", "QuasiArrays", "Test"]
+git-tree-sha1 = "0f82ee3f5cef2731c32609c4376416b59daf5c68"
+repo-rev = "upgrade"
 repo-url = "https://github.com/jagot/FEDVRQuasi.jl.git"
 uuid = "a2e24d02-e4f7-11e8-15c0-0b59d0e1f6f3"
 version = "0.1.0"
 
 [[FFTW]]
-deps = ["AbstractFFTs", "BinaryProvider", "Compat", "Conda", "Libdl", "LinearAlgebra", "Reexport", "Test"]
-git-tree-sha1 = "29cda58afbf62f35b1a094882ad6c745a47b2eaa"
+deps = ["AbstractFFTs", "BinaryProvider", "Conda", "Libdl", "LinearAlgebra", "Reexport", "Test"]
+git-tree-sha1 = "e1a479d3c972f20c9a70563eec740bbfc786f515"
 uuid = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
-version = "0.2.4"
+version = "0.3.0"
 
 [[FastGaussQuadrature]]
 deps = ["Compat", "LinearAlgebra", "SpecialFunctions"]
@@ -122,34 +122,42 @@ uuid = "442a2c76-b920-505d-bb47-c5924d526838"
 version = "0.3.3"
 
 [[FillArrays]]
-deps = ["LinearAlgebra", "Random", "SparseArrays", "Test"]
-git-tree-sha1 = "9ab8f76758cbabba8d7f103c51dce7f73fcf8e92"
+deps = ["LinearAlgebra", "Random", "SparseArrays"]
+git-tree-sha1 = "8fba6ddaf66b45dec830233cea0aae43eb1261ad"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "0.6.3"
+version = "0.6.4"
 
 [[FiniteDifferencesQuasi]]
-deps = ["ContinuumArrays", "IntervalSets", "LazyArrays", "LinearAlgebra", "Printf", "Test"]
-git-tree-sha1 = "c9f830027573ad30f92dd0c4b2f4b9cdc6dbeefd"
-repo-rev = "master"
+deps = ["ContinuumArrays", "InfiniteLinearAlgebra", "IntervalSets", "LazyArrays", "LinearAlgebra", "Printf", "QuasiArrays", "SparseArrays", "Test"]
+git-tree-sha1 = "5d7179a3b10178478cc2c60f2ee939b5fc1e6da7"
+repo-rev = "upgrade"
 repo-url = "https://github.com/jagot/FiniteDifferencesQuasi.jl.git"
 uuid = "2e420920-f185-11e8-29af-4b87f0732ba2"
 version = "0.1.0"
 
 [[InfiniteArrays]]
 deps = ["DSP", "FillArrays", "LazyArrays", "LinearAlgebra", "SparseArrays", "Statistics", "Test"]
-git-tree-sha1 = "9987fa7464aa1f3068ca85717ad61bd5c0441ec6"
+git-tree-sha1 = "cc2cb4bfb7893bba4f15974944d85f8a90812423"
 uuid = "4858937d-0d70-526a-a4dd-2d5cb5dd786c"
-version = "0.1.0"
+version = "0.1.3"
+
+[[InfiniteLinearAlgebra]]
+deps = ["BandedMatrices", "BlockArrays", "BlockBandedMatrices", "FillArrays", "InfiniteArrays", "LazyArrays", "LinearAlgebra", "MatrixFactorizations"]
+git-tree-sha1 = "4ad285cc77dfc0ea0ad7cf445bad3400955a22fc"
+repo-rev = "master"
+repo-url = "https://github.com/JuliaMatrices/InfiniteLinearAlgebra.jl"
+uuid = "cde9dba0-b1de-11e9-2c62-0bab9446c55c"
+version = "0.0.1"
 
 [[InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[IntervalSets]]
-deps = ["Compat"]
-git-tree-sha1 = "9dc556002f23740de13946e8c2e41798e09a9249"
+deps = ["Dates", "Statistics"]
+git-tree-sha1 = "4214b48a62eb8f2c292b2ee34a508c256c0cdbc9"
 uuid = "8197267c-284f-5f27-9208-e0e47529a953"
-version = "0.3.1"
+version = "0.3.2"
 
 [[IterativeFactorizations]]
 deps = ["AlgebraicMultigrid", "BlockBandedMatrices", "IterativeSolvers", "LinearAlgebra", "SparseArrays"]
@@ -166,16 +174,18 @@ uuid = "42fd0dbc-a981-5370-80f2-aaf504508153"
 version = "0.8.1"
 
 [[JSON]]
-deps = ["Dates", "Distributed", "Mmap", "Sockets", "Test", "Unicode"]
-git-tree-sha1 = "1f7a25b53ec67f5e9422f1f551ee216503f4a0fa"
+deps = ["Dates", "Mmap", "Parsers", "Unicode"]
+git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
-version = "0.20.0"
+version = "0.21.0"
 
 [[LazyArrays]]
-deps = ["FillArrays", "LinearAlgebra", "MacroTools", "StaticArrays", "Test"]
-git-tree-sha1 = "78f4dd7e19b21d82f3541a59a887ab92f0ab00b6"
+deps = ["FillArrays", "LinearAlgebra", "MacroTools", "StaticArrays"]
+git-tree-sha1 = "3c2006a85fcd2cbdc110e9b9083df3937b0b2c25"
+repo-rev = "master"
+repo-url = "https://github.com/JuliaArrays/LazyArrays.jl.git"
 uuid = "5078a376-72f3-5289-bfd5-ec5146d43c02"
-version = "0.8.1"
+version = "0.10.1"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -191,10 +201,10 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MacroTools]]
-deps = ["CSTParser", "Compat", "DataStructures", "Test"]
-git-tree-sha1 = "daecd9e452f38297c686eba90dba2a6d5da52162"
+deps = ["CSTParser", "Compat", "DataStructures", "Test", "Tokenize"]
+git-tree-sha1 = "d6e9dedb8c92c3465575442da456aec15a89ff76"
 uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
-version = "0.5.0"
+version = "0.5.1"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -202,9 +212,9 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[MatrixFactorizations]]
 deps = ["LinearAlgebra", "Random", "Test"]
-git-tree-sha1 = "cebc71d929a846dda61400f1cf3ba69c7e75fa63"
+git-tree-sha1 = "95ed2db8197ef7eadce558dff0e9595169672aee"
 uuid = "a3b82374-2e81-5b9e-98ce-41277c0e4c87"
-version = "0.0.4"
+version = "0.1.0"
 
 [[Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
@@ -214,6 +224,12 @@ deps = ["Random", "Serialization", "Test"]
 git-tree-sha1 = "c4c13474d23c60d20a67b217f1d7f22a40edf8f1"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 version = "1.1.0"
+
+[[Parsers]]
+deps = ["Dates", "Test"]
+git-tree-sha1 = "db2b35dedab3c0e46dc15996d170af07a5ab91c9"
+uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
+version = "0.3.6"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
@@ -233,6 +249,14 @@ uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 deps = ["Printf"]
 uuid = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
 
+[[QuasiArrays]]
+deps = ["LazyArrays", "LinearAlgebra"]
+git-tree-sha1 = "2af78f9a22554333aab35073c90d6211898184c5"
+repo-rev = "master"
+repo-url = "https://github.com/JuliaApproximation/QuasiArrays.jl.git"
+uuid = "c4ea9172-b204-11e9-377d-29865faadc5c"
+version = "0.0.2"
+
 [[REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
@@ -242,10 +266,9 @@ deps = ["Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[RecipesBase]]
-deps = ["Random", "Test"]
-git-tree-sha1 = "0b3cb370ee4dc00f47f1193101600949f3dcf884"
+git-tree-sha1 = "7bdce29bc9b2f5660a6e5e64d64d91ec941f6aa2"
 uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
-version = "0.6.0"
+version = "0.7.0"
 
 [[Reexport]]
 deps = ["Pkg"]
@@ -277,10 +300,10 @@ uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
 version = "0.7.2"
 
 [[StaticArrays]]
-deps = ["InteractiveUtils", "LinearAlgebra", "Random", "Statistics", "Test"]
-git-tree-sha1 = "3841b39ed5f047db1162627bf5f80a9cd3e39ae2"
+deps = ["LinearAlgebra", "Random", "Statistics"]
+git-tree-sha1 = "db23bbf50064c582b6f2b9b043c8e7e98ea8c0c6"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "0.10.3"
+version = "0.11.0"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
@@ -291,10 +314,9 @@ deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[Tokenize]]
-deps = ["Printf", "Test"]
-git-tree-sha1 = "3e83f60b74911d3042d3550884ca2776386a02b8"
+git-tree-sha1 = "dfcdbbfb2d0370716c815cbd6f8a364efb6f42cf"
 uuid = "0796e94c-ce3b-5d07-9a54-7f471281c624"
-version = "0.5.3"
+version = "0.5.6"
 
 [[URIParser]]
 deps = ["Test", "Unicode"]

@@ -5,16 +5,22 @@ version = "0.1.0"
 
 [deps]
 BlockBandedMatrices = "ffab5731-97b5-5995-9138-79e8c1846df0"
-ContinuumArrays = "abb603bd-c6a4-5c0b-b5d0-50a836a7e82c"
+ContinuumArrays = "7ae1f121-cc2c-504b-ac30-9b923412ae5c"
 FEDVRQuasi = "a2e24d02-e4f7-11e8-15c0-0b59d0e1f6f3"
 FiniteDifferencesQuasi = "2e420920-f185-11e8-29af-4b87f0732ba2"
+InfiniteLinearAlgebra = "cde9dba0-b1de-11e9-2c62-0bab9446c55c"
 IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
 IterativeFactorizations = "f1b39ad4-3e99-11e9-193e-b3ae8ec46476"
 LazyArrays = "5078a376-72f3-5289-bfd5-ec5146d43c02"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
+QuasiArrays = "c4ea9172-b204-11e9-377d-29865faadc5c"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+julia = "1.1"
+LazyArrays = "0.10"
 
 [extras]
 ArnoldiMethod = "ec485272-7323-5ecc-a04f-4719b315124d"

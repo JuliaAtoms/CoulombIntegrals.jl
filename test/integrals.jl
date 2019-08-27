@@ -40,8 +40,8 @@ function get_Fᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
     vv = materialize(v)
 
     # Perform the integral over the other coordinate.
-    Fᵏ = (vv.*vv)'*(R*(Yᵏ./r))
-    Fᵏ′ = (uu.*uu)'*(R*(Yᵏ′./r))
+    Fᵏ = vv'*(R*(Diagonal(Yᵏ./r)*v.args[2]))
+    Fᵏ′ = uu'*(R*(Diagonal(Yᵏ′./r)*u.args[2]))
 
     Fᵏ,Fᵏ′
 end
@@ -54,9 +54,8 @@ function get_Gᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
     Yᵏ = get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
 
     uu = materialize(u)
-    vv = materialize(v)
 
-    Gᵏ = (uu.*vv)'*(R*(Yᵏ./r))
+    Gᵏ = uu'*(R*(Diagonal(Yᵏ./r)*v.args[2]))
 end
 
 function Yᵏ_error(R, ρ, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mode,V,poissons)

@@ -47,7 +47,7 @@ include("test_convergence_rates.jl")
 
     @testset "Yᵏ convergence rates" begin
         @testset "$Basis" for (Basis,Rf,Ns,errors) in [
-            fedvr_inputs(range(1,stop=5,length=30),
+            fedvr_inputs(range(1,stop=5,length=20),
                          [(6, "local", 2e-5, 7.0)]),
             fd_inputs(range(6.5,stop=10,length=15),
                       [(6, "local", 1e-3, 2.0)])
@@ -68,7 +68,7 @@ include("test_convergence_rates.jl")
 
     @testset "Fᵏ convergence rates" begin
         @testset "$Basis" for (Basis,Rf,Ns,errors) in [
-            fedvr_inputs(range(2,stop=6,length=30),
+            fedvr_inputs(range(2,stop=6,length=20),
                          [(11,"δF",2e-6,6.0),
                           (13,"δF′",2e-6,6.0)]),
             fd_inputs(range(7,stop=11,length=15),
@@ -90,7 +90,7 @@ include("test_convergence_rates.jl")
 
     @testset "Gᵏ convergence rates" begin
         @testset "$Basis" for (Basis,Rf,Ns,errors) in [
-            fedvr_inputs(range(2,stop=6,length=30),
+            fedvr_inputs(range(2,stop=6,length=20),
                          [(11,"δG",2e-6,6.0)]),
             fd_inputs(range(7,stop=12,length=15),
                       [(11,"δG",2e-4,2.0)])

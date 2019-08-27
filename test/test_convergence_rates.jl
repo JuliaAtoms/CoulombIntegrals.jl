@@ -10,8 +10,9 @@ if VERSION < v"1.1-DEV"
 end
 
 function estimate_convergence_rate(ρ, ϵ)
-    x = log10.(ρ)
-    y = log10.(abs.(ϵ))
+    i = findall(!iszero, ϵ)
+    x = log10.(ρ[i])
+    y = log10.(abs.(ϵ[i]))
 
     f = (x,y) -> ([x ones(length(x))] \ y)[1]
 

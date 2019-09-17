@@ -10,6 +10,7 @@ import ContinuumArrays.QuasiArrays: AbstractQuasiArray, AbstractQuasiMatrix, Mul
 using IntervalSets
 
 using FEDVRQuasi
+using BlockBandedMatrices
 using FiniteDifferencesQuasi
 
 using SpecialFunctions

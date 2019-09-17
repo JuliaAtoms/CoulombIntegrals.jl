@@ -30,17 +30,34 @@ end
 Return Laplacian (multiplied by `2`) for partial wave `k` of the
 basis `R`, `-∂ᵣ² + k(k+1)/r²`.
 """
-function get_double_laplacian(R::B,k::I,::Type{T}) where {B<:AbstractQuasiMatrix,I<:Integer,T}
+function get_double_laplacian(R,k,::Type{T}) where T
     D = Derivative(axes(R,1))
     Tᵏ = R' * D' * D * R
-    r = locs(R)
+    r = axes(R,1)
     Tᵏ *= -1
-    V = Matrix(r -> k*(k+1)/r^2, R) # Is this correct for any basis? E.g. banded in B-splines?
+    V = R'QuasiDiagonal(k*(k+1)./r.^2)*R
     Tᵏ += V
-    isreal(T) ? Tᵏ : complex(Tᵏ)
+    isreal(one(T)) ? Tᵏ : complex(Tᵏ)
 end
 
-# LinearAlgebra.isposdef(T::Union{Tridiagonal,SymTridiagonal}) = isposdef(Matrix(T))
+struct PoissonCache{M,F,V₁,V₂}
+    Tᵏ::M
+    Tᵏ⁻¹::F
+    rᵏ::V₁
+    rᵏ⁺¹::V₂
+end
+
+function get_or_create_poisson_cache!(poisson_cache, k, R, ::Type{T}; kwargs...) where T
+    k in keys(poisson_cache) && return poisson_cache[k]
+    Tᵏ = get_double_laplacian(R,k,T)
+    Tᵏ⁻¹ = Tᵏ isa BlockSkylineMatrix ? inv(Matrix(Tᵏ)) : factorization(Tᵏ; kwargs...)
+    r = axes(R,1)
+    rᵏ = R \ r.^k
+    rᵏ⁺¹ = R \ r.^(k+1)
+    pc = PoissonCache(Tᵏ, Tᵏ⁻¹, rᵏ, rᵏ⁺¹)
+    poisson_cache[k] = pc
+    pc
+end
 
 """
     PoissonProblem(k, u, v[; w′=similar(u), Tᵏ=get_double_laplacian(R,k)])
@@ -54,12 +71,11 @@ but with different orbitals `u` and/or `v`.
 """
 function PoissonProblem(k::Int, u::RO₁, v::RO₂;
                         w′::RO₃=similar(u),
-                        Tᵏ::M = get_double_laplacian(u.args[1],k,T),
+                        poisson_cache::Dict{Int,<:PoissonCache} = Dict{Int,PoissonCache}(),
                         kwargs...) where {T,B<:AbstractQuasiMatrix,
                                           RO₁<:RadialOrbital{T,B},
                                           RO₂<:RadialOrbital{T,B},
-                                          RO₃<:RadialOrbital{T,B},
-                                          M<:AbstractMatrix}
+                                          RO₃<:RadialOrbital{T,B}}
     axes(u) == axes(v) || throw(DimensionMismatch("Incompatible axes"))
     Ru,cu = u.args
     Rv,cv = v.args
@@ -72,23 +88,17 @@ function PoissonProblem(k::Int, u::RO₁, v::RO₂;
     # Strong zero to get rid of random NaNs
     y.args[2] .= false
 
-    Tᵏ⁻¹ = factorization(Tᵏ; kwargs...)
+    pc = get_or_create_poisson_cache!(poisson_cache, k, Ru, T; kwargs...)
 
     R = w′.args[1]
-    r = locs(R)
-
     rₘₐₓ = rightendpoint(axes(R,1).domain)
 
     r = locs(R)
-    # Vandermonde matrix for interpolating functions
-    RV = R[r,:]
     r⁻¹ = inv.(r)
-    rᵏ = RV \ r.^k
-    rᵏ⁺¹ = RV \ r.^(k+1)
 
     PoissonProblem(k, r⁻¹,
-                   R ⋆ rᵏ, rᵏ⁺¹, inv(rₘₐₓ^(2k+1)),
-                   Tᵏ, u .⋆ v, ρ, zero(T), rhs, y, w′, Tᵏ⁻¹)
+                   R ⋆ pc.rᵏ, pc.rᵏ⁺¹, inv(rₘₐₓ^(2k+1)),
+                   pc.Tᵏ, u .⋆ v, ρ, zero(T), rhs, y, w′, pc.Tᵏ⁻¹)
 end
 
 #=
@@ -154,6 +164,11 @@ function weightit!(w::RadialOrbital{T,B}) where {T,B<:FEDVRQuasi.BasisOrRestrict
 end
 weightit!(w::RadialOrbital) = w
 
+# Various factorizations
+solve!(x, A⁻¹, b) = ldiv!(x, A⁻¹, b)
+# Dense inverse
+solve!(x, A⁻¹::AbstractMatrix, b) = mul!(x, A⁻¹, b)
+
 function (pp::PoissonProblem)(lazy_density=pp.uv; verbosity=0, io::IO=stdout, kwargs...)
     k,ρ,r⁻¹ = pp.k,pp.ρ,pp.r⁻¹
     R,ρc = ρ.args
@@ -163,7 +178,7 @@ function (pp::PoissonProblem)(lazy_density=pp.uv; verbosity=0, io::IO=stdout, kw
     copyto!(ρ, lazy_density) # Form density
 
     pp.rhs .= (2k+1) * ρc .* r⁻¹
-    ldiv!(yc, pp.Tᵏ⁻¹, pp.rhs)
+    solve!(yc, pp.Tᵏ⁻¹, pp.rhs)
 
     copyto!(wc, yc)
 
@@ -236,7 +251,7 @@ function AsymptoticPoissonProblem(k::Int, u::RO₁, v::RO₂,
                         w′ = applied(*, R̃, view(w′c, inner)),
                         kwargs...)
 
-    w̃ = inv.(r.^(k+1))
+    w̃ = inv.(r.^(k+1)) # Is this correct for any basis?
     AsymptoticPoissonProblem(pp, R̃, inner, w′, view(w′c, tail), w̃)
 end
 

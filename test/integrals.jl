@@ -36,12 +36,13 @@ function get_Fᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
     Yᵏ = get_Yᵏ(R,k,n,ℓ,n,ℓ,Z,orbital_mode,coulomb_mode,V,poissons)
     Yᵏ′ = get_Yᵏ(R,k,n′,ℓ′,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
 
-    uu = materialize(u)
-    vv = materialize(v)
+    # Apply Slater potential to orbital
+    yv = applied(*, R, Diagonal(Yᵏ./r)*v.args[2])
+    yu = applied(*, R, Diagonal(Yᵏ′./r)*u.args[2])
 
     # Perform the integral over the other coordinate.
-    Fᵏ = vv'*(R*(Diagonal(Yᵏ./r)*v.args[2]))
-    Fᵏ′ = uu'*(R*(Diagonal(Yᵏ′./r)*u.args[2]))
+    Fᵏ = apply(*, v', yv)
+    Fᵏ′ = apply(*, u', yu)
 
     Fᵏ,Fᵏ′
 end
@@ -53,9 +54,11 @@ function get_Gᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
 
     Yᵏ = get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
 
-    uu = materialize(u)
+    # Apply Slater potential to orbital
+    yv = applied(*, R, Diagonal(Yᵏ./r)*v.args[2])
 
-    Gᵏ = uu'*(R*(Diagonal(Yᵏ./r)*v.args[2]))
+    # Perform the integral over the other coordinate.
+    Gᵏ = apply(*, u', yv)
 end
 
 function Yᵏ_error(R, ρ, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mode,V,poissons)

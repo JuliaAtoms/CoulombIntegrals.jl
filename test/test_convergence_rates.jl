@@ -99,12 +99,15 @@ function test_convergence_rates(fun::Function,
                           ft_printf("%2.3f", passjs .- 1),
                           Dict(j => (v,i) -> v ? "✓" : "⨯" for j in passjs))
 
-        pretty_table(convergence_rates,
-                     vcat("Case", [["$elabel, minδ [$eexpected]", "$elabel, rate [$rateexpected]", "Pass"]
-                                   for (_,elabel,eexpected,rateexpected) in errors]...),
-                     highlighters=(pass,fail),
-                     formatter=formatter,
-                     crop=:none)
+        sel = verbosity == 1 ? findall(.!vec(convergence_rates[:,end])) : (1:size(convergence_rates,1))
+        if !isempty(sel)
+            pretty_table(convergence_rates[sel, :],
+                         vcat("Case", [["$elabel, minδ [$eexpected]", "$elabel, rate [$rateexpected]", "Pass"]
+                                       for (_,elabel,eexpected,rateexpected) in errors]...),
+                         highlighters=(pass,fail),
+                         formatter=formatter,
+                         crop=:none)
+        end
         fails = sum([count(.!convergence_rates[:,j]) for j in passjs])
         num_cases = length(errors)*size(convergence_rates,1)
         println("Number of fails: $fails ≡ $(100.0fails/num_cases)% fail rate")

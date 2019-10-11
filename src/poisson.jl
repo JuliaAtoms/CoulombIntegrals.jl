@@ -24,6 +24,9 @@ mutable struct PoissonProblem{T,U,B<:AbstractQuasiMatrix,
     Tᵏ⁻¹::Factorization # Factorized Laplacian
 end
 
+isrealtype(::Type{T}) where {T<:Real} = true
+isrealtype(::Type{T}) where {T<:Complex} = false
+
 """
     get_double_laplacian(R, k)
 
@@ -37,7 +40,7 @@ function get_double_laplacian(R,k,::Type{T}) where T
     Tᵏ *= -1
     V = R'QuasiDiagonal(k*(k+1)./r.^2)*R
     Tᵏ += V
-    isreal(one(T)) ? Tᵏ : complex(Tᵏ)
+    isrealtype(T) ? Tᵏ : complex(Tᵏ)
 end
 
 struct PoissonCache{M,F,V₁,V₂}

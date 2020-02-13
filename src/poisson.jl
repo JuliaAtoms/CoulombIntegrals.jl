@@ -35,10 +35,10 @@ basis `R`, `-∂ᵣ² + k(k+1)/r²`.
 """
 function get_double_laplacian(R,k,::Type{T}) where T
     D = Derivative(axes(R,1))
-    Tᵏ = R' * D' * D * R
+    Tᵏ = apply(*, R', D', D, R)
     r = axes(R,1)
     Tᵏ *= -1
-    V = R'QuasiDiagonal(k*(k+1)./r.^2)*R
+    V = apply(*, R', QuasiDiagonal(k*(k+1)./r.^2), R)
     Tᵏ += V
     isrealtype(T) ? Tᵏ : complex(Tᵏ)
 end
@@ -96,7 +96,7 @@ function PoissonProblem(k::Int, u::RO₁, v::RO₂;
     R = w′.args[1]
     rₘₐₓ = rightendpoint(axes(R,1).domain)
 
-    r = locs(R)
+    r = apply(*, R', QuasiDiagonal(axes(R,1)), R).diag
     r⁻¹ = inv.(r)
 
     PoissonProblem(k, r⁻¹,
@@ -212,7 +212,7 @@ mutable struct AsymptoticPoissonProblem{T,U,B₁,B₂,
                                         RO₁<:RadialOrbital{T,B₂},
                                         VO₂, VO₃} <: AbstractPoissonProblem
     pp::PP # Poisson problem of the inner region
-    R̃::B₂ # Basis of the inner region
+    R̃::B₁ # Basis of the inner region
     inner::I # Range of inner region
     w′::RO₁ # Solution
     w′tail::VO₂ # View of the asymptotic part of w′
@@ -246,7 +246,7 @@ function AsymptoticPoissonProblem(k::Int, u::RO₁, v::RO₂,
         throw(ArgumentError("$(R̃) not a subset of $(R)"))
     inner = 1:size(R̃,2)
     tail = inner[end]+1:size(R,2)
-    r = locs(R)[tail]
+    r = apply(*, R', QuasiDiagonal(axes(R,1)), R).diag[tail]
 
     pp = PoissonProblem(k,
                         applied(*, R̃, view(uc, inner)),

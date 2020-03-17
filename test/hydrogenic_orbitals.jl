@@ -1,4 +1,3 @@
-using LinearAlgebra
 using ArnoldiMethod
 import ContinuumArrays.QuasiArrays: AbstractQuasiMatrix
 using LazyArrays

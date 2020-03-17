@@ -3,12 +3,15 @@ using FEDVRQuasi
 using FillArrays
 using LazyArrays
 using FiniteDifferencesQuasi
+using LinearAlgebra
 using Test
 
 include("exact_poisson.jl")
 include("hydrogenic_orbitals.jl")
 include("integrals.jl")
 include("test_convergence_rates.jl")
+
+include("poisson_problem_hermiticity.jl")
 
 @testset "Accuracy tests" begin
     rₘₐₓ = 100.0

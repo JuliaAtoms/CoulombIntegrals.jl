@@ -186,7 +186,7 @@ function (pp::PoissonProblem)(lazy_density=pp.uv; verbosity=0, io::IO=stdout, kw
     copyto!(wc, yc)
 
     # Add in homogeneous contribution
-    pp.∫ρ = materialize(applied(*, ρ', pp.rᵏ))
+    pp.∫ρ = materialize(applied(*, pp.rᵏ', ρ))
     s = pp.∫ρ*pp.rₘₐₓ⁻²ᵏ⁺¹
     wc .+= s*pp.rᵏ⁺¹
 

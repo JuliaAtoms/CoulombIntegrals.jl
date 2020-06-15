@@ -42,7 +42,7 @@ include("poisson_problem_hermiticity.jl")
     fd_inputs(exponents,errors) =
         ("Finite-differences",
          (rₘₐₓ,N) -> begin
-         R = RadialDifferences(rₘₐₓ,N,Z)
+         R = StaggeredFiniteDifferences(rₘₐₓ,N,Z)
          R,step(R)
          end,
          unique(ceil.(Int, 2 .^ exponents)),

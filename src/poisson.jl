@@ -1,28 +1,19 @@
 abstract type AbstractPoissonProblem end
 
-mutable struct PoissonProblem{T,U,B<:AbstractQuasiMatrix,
-                              V<:AbstractVector{U},
-                              M<:AbstractMatrix, LD,
-                              RV<:RadialOrbital{U,B},
-                              RO₁<:RadialOrbital{T,B},
-                              RHS<:AbstractVector,
-                              RO₂<:RadialOrbital{T,B},
-                              RO₃<:RadialOrbital{T,B},
-                              Factorization} <: AbstractPoissonProblem
-    k::Int
-    r⁻¹::V
-    rᵏ::RV
-    rᵏ⁺¹::V
-    rₘₐₓ⁻²ᵏ⁺¹::U
-    Tᵏ::M # Laplacian
-    uv::LD # Lazy mutual density
-    ρ::RO₁ # Mutual density
-    ∫ρ::T # Integrated mutual density
-    rhs::RHS # Right-hand side of Poisson problem
-    y::RO₂ # Intermediate solution
-    w′::RO₃ # Solution
-    Tᵏ⁻¹::Factorization # Factorized Laplacian
+mutable struct PoissonProblem{C,InvLaplacian,Diag,Vec,Yt,Metric} <: AbstractPoissonProblem
+    k::C
+    T⁻¹::InvLaplacian # Factorized Laplacian
+    r⁻¹::Diag
+    rhs::Vec # Right-hand side of Poisson problem
+    Y::Yt
+    rᵏ::Vec
+    rᵏ⁺¹::Vec
+    rₘₐₓ⁻²ᵏ⁺¹::C
+    S::Metric
+    ∫ρ::C # Integrated mutual density
 end
+
+Base.eltype(::PoissonProblem{C}) where C = C
 
 isrealtype(::Type{T}) where {T<:Real} = true
 isrealtype(::Type{T}) where {T<:Complex} = false
@@ -37,33 +28,40 @@ function get_double_laplacian(R,k,::Type{T}) where T
     D = Derivative(axes(R,1))
     Tᵏ = apply(*, R', D', D, R)
     r = axes(R,1)
-    Tᵏ *= -1
+    if Tᵏ isa BlockSkylineMatrix
+        Tᵏ = Matrix(Tᵏ)
+    end
     V = apply(*, R', QuasiDiagonal(k*(k+1)./r.^2), R)
-    Tᵏ += V
+    Tᵏ -= V
     isrealtype(T) ? Tᵏ : complex(Tᵏ)
 end
 
-struct PoissonCache{M,F,V₁,V₂}
-    Tᵏ::M
-    Tᵏ⁻¹::F
+struct PoissonCache{M,F,Diag,V₁,V₂}
+    T::M
+    T⁻¹::F
+    r⁻¹::Diag
     rᵏ::V₁
     rᵏ⁺¹::V₂
 end
 
-function get_or_create_poisson_cache!(poisson_cache, k, R, ::Type{T}; kwargs...) where T
+function get_or_create_poisson_cache!(poisson_cache, k, R, ::Type{C}) where C
     k in keys(poisson_cache) && return poisson_cache[k]
-    Tᵏ = get_double_laplacian(R,k,T)
-    Tᵏ⁻¹ = Tᵏ isa BlockSkylineMatrix ? inv(Matrix(Tᵏ)) : factorization(Tᵏ; kwargs...)
+    T = get_double_laplacian(R,k,C)
+    T⁻¹ = factorize(T isa BlockSkylineMatrix ? Matrix(T) : T)
     r = axes(R,1)
-    rᵏ = R \ r.^k
-    rᵏ⁺¹ = R \ r.^(k+1)
-    pc = PoissonCache(Tᵏ, Tᵏ⁻¹, rᵏ, rᵏ⁺¹)
+
+    f = isrealtype(C) ? identity : complex
+    r⁻¹ = f(R'*QuasiDiagonal(1 ./ r)*R)
+    rᵏ   = f(R \ r.^k)
+    rᵏ⁺¹ = f(R \ r.^(k+1))
+
+    pc = PoissonCache(T, T⁻¹, r⁻¹, rᵏ, rᵏ⁺¹)
     poisson_cache[k] = pc
     pc
 end
 
 """
-    PoissonProblem(k, u, v[; w′=similar(u), Tᵏ=get_double_laplacian(R,k)])
+    PoissonProblem(k, u, v[; w′=similar(u)])
 
 Create the Poisson problem of order `k` for the mutual density `u†(r)
 .* v(r)`. `w′` is a `MulQuasiVector` of the same kind as `u` and `v`,
@@ -72,36 +70,16 @@ is e.g. the diagonal of a potential matrix. The same way, the
 Laplacian may be reused from other Poisson problems of the same order,
 but with different orbitals `u` and/or `v`.
 """
-function PoissonProblem(k::Int, u::RO₁, v::RO₂;
-                        w′::RO₃=similar(u),
-                        poisson_cache::Dict{Int,<:PoissonCache} = Dict{Int,PoissonCache}(),
-                        kwargs...) where {T,B<:AbstractQuasiMatrix,
-                                          RO₁<:RadialOrbital{T,B},
-                                          RO₂<:RadialOrbital{T,B},
-                                          RO₃<:RadialOrbital{T,B}}
-    axes(u) == axes(v) || throw(DimensionMismatch("Incompatible axes"))
-    Ru,cu = u.args
-    Rv,cv = v.args
-    Ru == Rv || throw(DimensionMismatch("Incompatible bases"))
+function PoissonProblem(R, k, ::Type{C}=eltype(R);
+                        poisson_cache::Dict{Int,<:PoissonCache} = Dict{Int,PoissonCache}()) where C
+    pc = get_or_create_poisson_cache!(poisson_cache, k, R, C)
+    Y = zeros(C, size(R,2))
 
-    ρ = similar(u)
-    rhs = similar(u.args[2])
+    r = axes(R,1)
+    rₘₐₓ⁻²ᵏ⁺¹ = inv(rightendpoint(r.domain)^(2k+1))
 
-    y=similar(w′)
-    # Strong zero to get rid of random NaNs
-    y.args[2] .= false
-
-    pc = get_or_create_poisson_cache!(poisson_cache, k, Ru, T; kwargs...)
-
-    R = w′.args[1]
-    rₘₐₓ = rightendpoint(axes(R,1).domain)
-
-    r = apply(*, R', QuasiDiagonal(axes(R,1)), R).diag
-    r⁻¹ = inv.(r)
-
-    PoissonProblem(k, r⁻¹,
-                   R ⋆ pc.rᵏ, pc.rᵏ⁺¹, inv(rₘₐₓ^(2k+1)),
-                   pc.Tᵏ, u .⋆ v, ρ, zero(T), rhs, y, w′, pc.Tᵏ⁻¹)
+    PoissonProblem(C(k), pc.T⁻¹, pc.r⁻¹, similar(Y), Y,
+                   pc.rᵏ, pc.rᵏ⁺¹, C(rₘₐₓ⁻²ᵏ⁺¹), R'R, zero(C))
 end
 
 #=
@@ -156,123 +134,83 @@ References:
 
 =#
 
-# Ugly work-around until Poisson problem is properly expressed in a
-# basis-agnostic way.
-function weightit!(w::RadialOrbital{T,B}) where {T,B<:FEDVRQuasi.BasisOrRestricted{<:FEDVR}}
-    R,wc = w.args
-    R′ = FEDVRQuasi.unrestricted_basis(R)
-    a,b = FEDVRQuasi.restriction_extents(R)
-    wc .*= R′.n[1+a:end-b]
-    w
-end
-weightit!(w::RadialOrbital) = w
-
-# Various factorizations
-solve!(x, A⁻¹, b) = ldiv!(x, A⁻¹, b)
-# Dense inverse
-solve!(x, A⁻¹::AbstractMatrix, b) = mul!(x, A⁻¹, b)
-
-function (pp::PoissonProblem)(lazy_density=pp.uv; verbosity=0, io::IO=stdout, kwargs...)
-    k,ρ,r⁻¹ = pp.k,pp.ρ,pp.r⁻¹
-    R,ρc = ρ.args
-    wc = pp.w′.args[2]
-    yc = pp.y.args[2]
-
-    copyto!(ρ, lazy_density) # Form density
-
-    pp.rhs .= (2k+1) * ρc .* r⁻¹
-    solve!(yc, pp.Tᵏ⁻¹, pp.rhs)
-
-    copyto!(wc, yc)
+function solve!(poisson::PoissonProblem, ρ::Density)
+    mul!(poisson.rhs, poisson.r⁻¹, ρ.ρ, -(2poisson.k+1), false)
+    ldiv!(poisson.Y, poisson.T⁻¹, poisson.rhs)
 
     # Add in homogeneous contribution
-    pp.∫ρ = materialize(applied(*, pp.rᵏ', ρ))
-    s = pp.∫ρ*pp.rₘₐₓ⁻²ᵏ⁺¹
-    wc .+= s*pp.rᵏ⁺¹
-
-    wc .*= r⁻¹
-
-    weightit!(pp.w′)
-
-    pp.w′
+    poisson.∫ρ = dot(poisson.rᵏ, poisson.S, ρ.ρ)
+    s = poisson.∫ρ*poisson.rₘₐₓ⁻²ᵏ⁺¹
+    poisson.Y .+= s .* poisson.rᵏ⁺¹
 end
 
-# For exchange potentials, where the density is formed in part from
-# the orbital which is "acted upon".
-function (pp::PoissonProblem)(v::RO; kwargs...) where {RO<:RadialOrbital}
-    R,vc = v.args
-    pp.uv.R == R ||
-        throw(DimensionMismatch("Cannot form mutual density from different bases"))
-    pp(applied(*, R, pp.uv.u) .⋆ v; kwargs...)
-end
+# mutable struct AsymptoticPoissonProblem{T,U,B₁,B₂,
+#                                         PP<:PoissonProblem{T,U,B₁},
+#                                         I<:AbstractRange,
+#                                         RO₁<:RadialOrbital{T,B₂},
+#                                         VO₂, VO₃} <: AbstractPoissonProblem
+#     pp::PP # Poisson problem of the inner region
+#     R̃::B₁ # Basis of the inner region
+#     inner::I # Range of inner region
+#     w′::RO₁ # Solution
+#     w′tail::VO₂ # View of the asymptotic part of w′
+#     w̃::VO₃ # Asymptotic part of the solution
+# end
 
-mutable struct AsymptoticPoissonProblem{T,U,B₁,B₂,
-                                        PP<:PoissonProblem{T,U,B₁},
-                                        I<:AbstractRange,
-                                        RO₁<:RadialOrbital{T,B₂},
-                                        VO₂, VO₃} <: AbstractPoissonProblem
-    pp::PP # Poisson problem of the inner region
-    R̃::B₁ # Basis of the inner region
-    inner::I # Range of inner region
-    w′::RO₁ # Solution
-    w′tail::VO₂ # View of the asymptotic part of w′
-    w̃::VO₃ # Asymptotic part of the solution
-end
+# """
+#     AsymptoticPoissonProblem(k, u, v, R̃[; w′=similar(U)])
 
-"""
-    AsymptoticPoissonProblem(k, u, v, R̃[; w′=similar(U)])
+# Create the Poisson problem of order `k` for the mutual density `u†(r)
+# .* v(r)`; the Poisson problem is solved numerically within the domain
+# of `R̃` and an asymptotic solution is used outside. For this to be
+# valid, `u` or `v` have to vanish before the end of `R̃`. `w′` is a
+# `MulQuasiVector` of the same kind as `u` and `v`, and may optionally
+# be provided as a pre-allocated vector, in case it is e.g. the diagonal
+# of a potential matrix.
+# """
+# function AsymptoticPoissonProblem(k::Int, u::RO₁, v::RO₂,
+#                                   R̃::AbstractQuasiMatrix;
+#                                   w′::RO₃=similar(u),
+#                                   kwargs...) where {T,B<:AbstractQuasiMatrix,
+#                                                     RO₁<:RadialOrbital{T,B},
+#                                                     RO₂<:RadialOrbital{T,B},
+#                                                     RO₃<:RadialOrbital{T,B}}
+#     uc = u.args[2]
+#     vc = u.args[2]
+#     R,w′c = w′.args
+#     # It is assumed that grid spacings &c agree.
+#     axes(R̃,1).domain ⊆ axes(R,1).domain &&
+#         axes(R̃,2) ⊆ axes(R,2) ||
+#         throw(ArgumentError("$(R̃) not a subset of $(R)"))
+#     inner = 1:size(R̃,2)
+#     tail = inner[end]+1:size(R,2)
+#     r = apply(*, R', QuasiDiagonal(axes(R,1)), R).diag[tail]
 
-Create the Poisson problem of order `k` for the mutual density `u†(r)
-.* v(r)`; the Poisson problem is solved numerically within the domain
-of `R̃` and an asymptotic solution is used outside. For this to be
-valid, `u` or `v` have to vanish before the end of `R̃`. `w′` is a
-`MulQuasiVector` of the same kind as `u` and `v`, and may optionally
-be provided as a pre-allocated vector, in case it is e.g. the diagonal
-of a potential matrix.
-"""
-function AsymptoticPoissonProblem(k::Int, u::RO₁, v::RO₂,
-                                  R̃::AbstractQuasiMatrix;
-                                  w′::RO₃=similar(u),
-                                  kwargs...) where {T,B<:AbstractQuasiMatrix,
-                                                    RO₁<:RadialOrbital{T,B},
-                                                    RO₂<:RadialOrbital{T,B},
-                                                    RO₃<:RadialOrbital{T,B}}
-    uc = u.args[2]
-    vc = u.args[2]
-    R,w′c = w′.args
-    # It is assumed that grid spacings &c agree.
-    axes(R̃,1).domain ⊆ axes(R,1).domain &&
-        axes(R̃,2) ⊆ axes(R,2) ||
-        throw(ArgumentError("$(R̃) not a subset of $(R)"))
-    inner = 1:size(R̃,2)
-    tail = inner[end]+1:size(R,2)
-    r = apply(*, R', QuasiDiagonal(axes(R,1)), R).diag[tail]
+#     pp = PoissonProblem(k,
+#                         applied(*, R̃, view(uc, inner)),
+#                         applied(*, R̃, view(vc, inner));
+#                         w′ = applied(*, R̃, view(w′c, inner)),
+#                         kwargs...)
 
-    pp = PoissonProblem(k,
-                        applied(*, R̃, view(uc, inner)),
-                        applied(*, R̃, view(vc, inner));
-                        w′ = applied(*, R̃, view(w′c, inner)),
-                        kwargs...)
+#     w̃ = inv.(r.^(k+1)) # Is this correct for any basis?
+#     AsymptoticPoissonProblem(pp, R̃, inner, w′, view(w′c, tail), w̃)
+# end
 
-    w̃ = inv.(r.^(k+1)) # Is this correct for any basis?
-    AsymptoticPoissonProblem(pp, R̃, inner, w′, view(w′c, tail), w̃)
-end
+# function (app::AsymptoticPoissonProblem)(lazy_density; kwargs...)
+#     u = applied(*, app.R̃, view(lazy_density.u, app.inner))
+#     v = applied(*, app.R̃, view(lazy_density.v, app.inner))
+#     app.pp(u .⋆ v)
 
-function (app::AsymptoticPoissonProblem)(lazy_density; kwargs...)
-    u = applied(*, app.R̃, view(lazy_density.u, app.inner))
-    v = applied(*, app.R̃, view(lazy_density.v, app.inner))
-    app.pp(u .⋆ v)
+#     # This is useful for the case we the asymptotic tail is not
+#     # actually needed, e.g. when applied to an orbital of compact
+#     # support.
+#     if !isempty(app.w̃)
+#         # Copy over asymptotic solution and weight it by the charge
+#         # density within the inner region.
+#         app.w′tail .= app.pp.∫ρ .* app.w̃
+#     end
 
-    # This is useful for the case we the asymptotic tail is not
-    # actually needed, e.g. when applied to an orbital of compact
-    # support.
-    if !isempty(app.w̃)
-        # Copy over asymptotic solution and weight it by the charge
-        # density within the inner region.
-        app.w′tail .= app.pp.∫ρ .* app.w̃
-    end
+#     app.w′
+# end
 
-    app.w′
-end
-
-export AbstractPoissonProblem, PoissonProblem, AsymptoticPoissonProblem
+export AbstractPoissonProblem, PoissonProblem, solve! # , AsymptoticPoissonProblem

@@ -45,15 +45,13 @@ function hydredwfn(n,ℓ,Z=1)
 end
 
 function get_orbitals(R::B, ℓ::Int, Z, nev::Int,
-                      mode::Symbol,
-                      V, r=CoulombIntegrals.locs(R)) where {T,B<:AbstractQuasiMatrix{T}}
+                      mode::Symbol) where {T,B<:AbstractQuasiMatrix{T}}
     if mode == :arnoldi
         println("Finding eigenstates for Z = $Z, ℓ = $ℓ")
         Tℓ = CoulombIntegrals.get_double_laplacian(R,ℓ,T)
         Tℓ ./= -2
         r = axes(R,1)
-        V = R' * QuasiDiagonal(-Z ./ r) * R
-        H = Tℓ + V
+        H = Tℓ + R' * QuasiDiagonal(-Z ./ r) * R
 
         schur,history = partialschur(H, nev=nev, tol=sqrt(eps()), which=SR())
         println(history)
@@ -61,7 +59,8 @@ function get_orbitals(R::B, ℓ::Int, Z, nev::Int,
 
         [(n+ℓ,ℓ) => normalize!(R ⋆ (schur.Q[:,n]*sign(schur.Q[1,n]))) for n = 1:nev]
     elseif mode == :symbolic
-        [(n,ℓ) => R ⋆ (V \ hydredwfn(n,ℓ,Z).(r))
+        r = axes(R,1)
+        [(n,ℓ) => applied(*, R, R \ hydredwfn(n,ℓ,Z).(r))
          for n ∈ ℓ .+ (1:nev)]
     else
         throw(ArgumentError("Unknown mode $(mode)"))

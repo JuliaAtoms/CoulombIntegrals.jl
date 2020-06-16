@@ -1,15 +1,69 @@
 using CoulombIntegrals
-using FEDVRQuasi
+using CompactBases
 using FillArrays
 using LazyArrays
-using FiniteDifferencesQuasi
 using LinearAlgebra
+using Parameters
 using Test
 
 include("exact_poisson.jl")
 include("hydrogenic_orbitals.jl")
 include("integrals.jl")
 include("test_convergence_rates.jl")
+
+@testset "Basic test" begin
+    function get_grid(grid_type, rmax, Z; ρ=0.1, ρmax=0.6, α=0.002)
+        ρ /= Z
+
+        if grid_type == :fd_uniform
+            N = ceil(Int, rmax/ρ)
+            FiniteDifferences(N, ρ)
+        elseif grid_type == :fd_loglin
+            StaggeredFiniteDifferences(0.1ρ, ρmax, α, rmax, 0*Z)
+        elseif grid_type == :implicit_fd
+            N = ceil(Int, rmax/ρ)
+            ImplicitFiniteDifferences(N, ρ, false, 0*Z)
+        elseif grid_type == :fedvr
+            t = range(0, stop=rmax, length=41)
+            FEDVR(t, Vcat(10,Fill(7,length(t)-2)))[:,2:end-1]
+        elseif grid_type == :bsplines
+            t = ExpKnotSet(5, -2.0, log10(rmax), 200)
+            BSpline(t)[:,2:end-1]
+        end
+    end
+
+    n,ℓ = 3,0
+    n′,ℓ′ = 2,0
+    k = abs(ℓ′-ℓ) # Multipole order
+
+    Z = 1.0
+    rmax = 40(max(n,n′)^1.05)/Z
+
+    grid_types = [(:fd_uniform, 2e-4),
+                  (:fd_loglin, 1e-6),
+                  (:implicit_fd, 2e-5),
+                  (:fedvr, 3e-7),
+                  (:bsplines, 5e-9)]
+
+    fYk = r -> exact_Yᵏs[((n,ℓ),(n′,ℓ′),k)](Z*r)
+    ϕf = hydredwfn(n, ℓ, Z)
+    ϕ′f = hydredwfn(n′, ℓ′, Z)
+
+    @testset "Grid = $(grid_type)" for (grid_type,tol) in grid_types
+        R = get_grid(grid_type, rmax, Z, ρ=0.1, ρmax=1.0)
+        r = axes(R,1)
+        Ỹᵏ = R \ fYk.(r)
+
+        ϕ = R \ ϕf.(r)
+        ϕ′ = R \ ϕ′f.(r)
+
+        ρ = Density(applied(*,R,ϕ), applied(*,R,ϕ′))
+        potential = CoulombRepulsionPotential(R, k)
+        copyto!(potential, ρ)
+        Y = potential.poisson.Y
+        @test Y ≈ Ỹᵏ atol=tol
+    end
+end
 
 include("poisson_problem_hermiticity.jl")
 
@@ -24,7 +78,7 @@ include("poisson_problem_hermiticity.jl")
     coulomb_modes = [:poisson]
     # # Direct integration is simply too slow.
     # coulomb_modes = [:poisson, :direct]
-    Z = 1
+    Z = 1.0
 
     fedvr_order = 10
 
@@ -48,6 +102,8 @@ include("poisson_problem_hermiticity.jl")
          unique(ceil.(Int, 2 .^ exponents)),
          errors)
 
+    # TODO: Add B-spline convergence tests
+
     @testset "Yᵏ convergence rates" begin
         @testset "$Basis" for (Basis,Rf,Ns,errors) in [
             fedvr_inputs(range(1,stop=5,length=20),
@@ -60,11 +116,11 @@ include("poisson_problem_hermiticity.jl")
                 errors,
                 ["N", "ρ", "a", "b", "k", "Local δ", "Global δ", "Time"],
                 orbital_modes, coulomb_modes,
-                sort(collect(keys(exact_Yᵏs)))) do R, ρ, V, poissons, orbital_mode, coulomb_mode, ((n,ℓ), (n′,ℓ′), k)
+                sort(collect(keys(exact_Yᵏs)))) do cache, orbital_mode, coulomb_mode, ((n,ℓ), (n′,ℓ′), k)
                     (n′ > n || n′ == n && ℓ′ > ℓ) && return nothing
-                    Yᵏ_error(R, ρ,
+                    Yᵏ_error(cache,
                              k, n, ℓ, n′, ℓ′, Z,
-                             orbital_mode, coulomb_mode, V, poissons)
+                             orbital_mode, coulomb_mode)
                 end
         end
     end
@@ -83,10 +139,10 @@ include("poisson_problem_hermiticity.jl")
                 errors,
                 ["N", "ρ", "a", "b", "c", "d", "k", "Exact", "Exact",
                  "F", "δ", "F′", "δ′", "F-F′", "Time"],
-                orbital_modes, coulomb_modes, collect(keys(exact_Fᵏs))) do R, ρ, V, poissons, orbital_mode, coulomb_mode, ((n,ℓ),(n′,ℓ′),k)
-                    Fᵏ_error(R, ρ,
+                orbital_modes, coulomb_modes, collect(keys(exact_Fᵏs))) do cache, orbital_mode, coulomb_mode, ((n,ℓ),(n′,ℓ′),k)
+                    Fᵏ_error(cache,
                              k, n, ℓ, n′, ℓ′,
-                             Z, orbital_mode, coulomb_mode, V, poissons)
+                             Z, orbital_mode, coulomb_mode)
                 end
         end
     end
@@ -103,10 +159,10 @@ include("poisson_problem_hermiticity.jl")
                 errors,
                 ["N", "ρ", "a", "b", "c", "d", "k", "Exact", "Exact",
                  "G", "δ", "Time"],
-                orbital_modes, coulomb_modes, collect(keys(exact_Gᵏs))) do R, ρ, V, poissons, orbital_mode, coulomb_mode, ((n,ℓ),(n′,ℓ′),k)
-                    Gᵏ_error(R, ρ,
+                orbital_modes, coulomb_modes, collect(keys(exact_Gᵏs))) do cache, orbital_mode, coulomb_mode, ((n,ℓ),(n′,ℓ′),k)
+                    Gᵏ_error(cache,
                              k, n, ℓ, n′, ℓ′,
-                             Z, orbital_mode, coulomb_mode, V, poissons)
+                             Z, orbital_mode, coulomb_mode)
                 end
         end
     end

@@ -3,7 +3,8 @@ if VERSION < v"1.1-DEV"
     isnothing(::Any) = false
 end
 
-function error_plot(fun::Function, Ns::AbstractVector{<:Integer},
+function error_plot(fun::Function,
+                    Rf, rₘₐₓ, Ns::AbstractVector{<:Integer},
                     ρcol::Int,
                     errors::Vector{<:Tuple{Int,String,<:Real,<:Real}},
                     elapsed_col::Int,
@@ -30,7 +31,7 @@ function error_plot(fun::Function, Ns::AbstractVector{<:Integer},
         loglog(ρ,data[:,elapsed_col],"s-")
     end
 
-    result = test_convergence_rates(fun, Ns, ρcol, errors, headers, other_vectors...;
+    result = test_convergence_rates(fun, Rf, rₘₐₓ, Ns, ρcol, errors, headers, other_vectors...;
                                     plot_fun=plot_fun, kwargs...)
 
     sca(sa)

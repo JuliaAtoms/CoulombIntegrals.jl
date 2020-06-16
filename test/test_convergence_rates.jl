@@ -49,9 +49,14 @@ function test_convergence_rates(fun::Function,
     progress = Progress(length(Ns))
     data = map(Ns) do N
         R,ρ = Rfun(rₘₐₓ, N)
-        V = R[CoulombIntegrals.locs(R),:]
-        poissons = Dict{Int,PoissonProblem}()
-        d = map(o -> fun(R, ρ, V, poissons, o...), ovs)
+        r = axes(R,1)
+        cache = (R = R,
+                 ρ = ρ,
+                 V = vandermonde(R),
+                 S = R'R,
+                 r⁻¹ = R'*QuasiDiagonal(1 ./ r)*R,
+                 poissons = Dict{Int,PoissonProblem}())
+        d = map(o -> fun(cache, o...), ovs)
         verbosity > 1 || ProgressMeter.next!(progress)
         d
     end
@@ -95,17 +100,18 @@ function test_convergence_rates(fun::Function,
                            bold = true, foreground = :green)
         fail = Highlighter((data,i,j) -> j>1 && mod(j-1,3)==0 && !data[i,j],
                            bold = true, foreground = :red)
-        formatter = merge(ft_printf("%2.3e", passjs .- 2),
-                          ft_printf("%2.3f", passjs .- 1),
-                          Dict(j => (v,i) -> v ? "✓" : "⨯" for j in passjs))
+        # formatter = merge(ft_printf("%2.3e", passjs .- 2),
+        #                   ft_printf("%2.3f", passjs .- 1),
+        #                   Dict(j => (v,i) -> v ? "✓" : "⨯" for j in passjs))
 
-        sel = verbosity == 1 ? findall(.!vec(convergence_rates[:,end])) : (1:size(convergence_rates,1))
+        fails = vec(.!reduce(&, convergence_rates[:,passjs], dims=2))
+        sel = verbosity == 1 ? findall(fails) : (1:size(convergence_rates,1))
         if !isempty(sel)
             pretty_table(convergence_rates[sel, :],
                          vcat("Case", [["$elabel, minδ [$eexpected]", "$elabel, rate [$rateexpected]", "Pass"]
                                        for (_,elabel,eexpected,rateexpected) in errors]...),
                          highlighters=(pass,fail),
-                         formatter=formatter,
+                         # formatter=formatter,
                          crop=:none)
         end
         fails = sum([count(.!convergence_rates[:,j]) for j in passjs])

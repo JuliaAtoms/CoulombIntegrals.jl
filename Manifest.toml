@@ -2,34 +2,34 @@
 
 [[ArrayLayouts]]
 deps = ["FillArrays", "LinearAlgebra"]
-git-tree-sha1 = "89182776a99b69964e995cc2f1e37b5fc3476d56"
+git-tree-sha1 = "a3254b3780a3544838ca0b7e23b1e9b06eb71bd8"
 uuid = "4c555306-a7a7-4459-81d9-ec55ddd5c99a"
-version = "0.3.4"
+version = "0.3.5"
 
 [[BandedMatrices]]
 deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra", "Random", "SparseArrays"]
-git-tree-sha1 = "ab0e98974a74abf7b2b3a89946d28695133a8ae7"
+git-tree-sha1 = "195ceb173f0759ca595770fac3b379e51579e5e7"
 uuid = "aae01518-5342-5314-be14-df237901396f"
-version = "0.15.11"
+version = "0.15.13"
 
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[BlockArrays]]
 deps = ["ArrayLayouts", "Compat", "LinearAlgebra"]
-git-tree-sha1 = "5e157c81f1321f2338e1e2b71389c7783d3f59e6"
+git-tree-sha1 = "1c0bd7b20ebc92062324104a74ab0d0ba0e5b949"
 uuid = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
-version = "0.12.8"
+version = "0.12.9"
 
 [[BlockBandedMatrices]]
 deps = ["ArrayLayouts", "BandedMatrices", "BlockArrays", "Distributed", "FillArrays", "LinearAlgebra", "MatrixFactorizations", "Pkg", "SharedArrays", "SparseArrays", "Statistics"]
-git-tree-sha1 = "d25d265bcb992551dc937085bc2c8f0b968ae82e"
+git-tree-sha1 = "cde3bb3565d71f52f28cc1284b280b2524b7a5cf"
 uuid = "ffab5731-97b5-5995-9138-79e8c1846df0"
-version = "0.8.6"
+version = "0.8.7"
 
 [[CompactBases]]
 deps = ["BandedMatrices", "BlockBandedMatrices", "ContinuumArrays", "FastGaussQuadrature", "FillArrays", "Formatting", "IntervalSets", "LazyArrays", "LinearAlgebra", "OffsetArrays", "QuasiArrays", "RecipesBase", "SparseArrays"]
-git-tree-sha1 = "20a6d95f6a7c036ef7c5dd13be930629ff6c5e18"
+git-tree-sha1 = "cf69478349fef644f78632adf61328fe91e48fb4"
 repo-rev = "master"
 repo-url = "https://github.com/JuliaApproximation/CompactBases.jl"
 uuid = "2c0377a8-7469-4ebd-be0f-82e501f20078"
@@ -78,9 +78,9 @@ version = "0.4.2"
 
 [[FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays"]
-git-tree-sha1 = "44f561e293987ffc84272cd3d2b14b0b93123d63"
+git-tree-sha1 = "bf726ba7ce99e00d10bf63c031285fb9ab3676ae"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "0.8.10"
+version = "0.8.11"
 
 [[Formatting]]
 deps = ["Printf"]
@@ -100,9 +100,9 @@ version = "0.5.1"
 
 [[LazyArrays]]
 deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra", "MacroTools", "MatrixFactorizations", "StaticArrays"]
-git-tree-sha1 = "58f1186d445ac4aed3571d6eb1a79e3361f66cad"
+git-tree-sha1 = "eb02bd7606db9516205b400da8ba01e829ed5f7b"
 uuid = "5078a376-72f3-5289-bfd5-ec5146d43c02"
-version = "0.16.12"
+version = "0.16.13"
 
 [[LibGit2]]
 deps = ["Printf"]
@@ -138,9 +138,9 @@ version = "0.4.1"
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[OffsetArrays]]
-git-tree-sha1 = "930db8ef90483570107f2396b1ffc6680f08e8b7"
+git-tree-sha1 = "ab697473e983a7499f463b696da8e8feb1b20ffd"
 uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
-version = "1.0.4"
+version = "1.1.0"
 
 [[OpenSpecFun_jll]]
 deps = ["CompilerSupportLibraries_jll", "Libdl", "Pkg"]

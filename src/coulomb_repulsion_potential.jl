@@ -9,7 +9,7 @@ end
 function CoulombRepulsionPotential(R::CompactBases.BasisOrRestricted,
                                    poisson::AbstractPoissonProblem;
                                    apply_metric_inverse=true)
-    V̂ = LinearOperator(DiagonalOperator(applied(*, R, poisson.Y)), R)
+    V̂ = DiagonalOperator(applied(*, R, poisson.Y))
     r = axes(R,1)
     r⁻¹ = R'*QuasiDiagonal(1 ./ r)*R
     tmp = zeros(eltype(poisson), size(R,2))
@@ -24,7 +24,7 @@ end
 
 function Base.copyto!(potential::CoulombRepulsionPotential, ρ::Density)
     solve!(potential.poisson, ρ)
-    copyto!(potential.V̂.A, potential.poisson.Y)
+    copyto!(potential.V̂, potential.poisson.Y)
     potential
 end
 

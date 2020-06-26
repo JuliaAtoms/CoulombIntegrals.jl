@@ -45,13 +45,18 @@ include("test_convergence_rates.jl")
                   (:fedvr, 3e-7),
                   (:bsplines, 5e-9)]
 
-    fYk = r -> exact_Yᵏs[((n,ℓ),(n′,ℓ′),k)](Z*r)
+    # All in the name of type-stability
+    Yk_scaled(Yk_f) = (r,Z) -> Yk_f(Z*r)
+    Yk_ref = exact_Yᵏs[((n,ℓ),(n′,ℓ′),k)]
+    fYk = Base.Fix2(Yk_scaled(Yk_ref), Z)
+
     ϕf = hydredwfn(n, ℓ, Z)
     ϕ′f = hydredwfn(n′, ℓ′, Z)
 
     @testset "Grid = $(grid_type)" for (grid_type,tol) in grid_types
         R = get_grid(grid_type, rmax, Z, ρ=0.1, ρmax=1.0)
         r = axes(R,1)
+
         Ỹᵏ = R \ fYk.(r)
 
         ϕ = R \ ϕf.(r)

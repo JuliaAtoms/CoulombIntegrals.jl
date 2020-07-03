@@ -39,11 +39,11 @@ include("test_convergence_rates.jl")
     Z = 1.0
     rmax = 40(max(n,n′)^1.05)/Z
 
-    grid_types = [(:fd_uniform, 2e-4),
-                  (:fd_loglin, 1e-6),
-                  (:implicit_fd, 2e-5),
-                  (:fedvr, 3e-7),
-                  (:bsplines, 5e-9)]
+    grid_types = [(:fd_uniform, 2e-4, 4e-8),
+                  (:fd_loglin, 1e-6, 5e-10),
+                  (:implicit_fd, 2e-5, 4e-8),
+                  (:fedvr, 3e-7, 8e-11),
+                  (:bsplines, 5e-9, 2e-9)]
 
     # All in the name of type-stability
     Yk_scaled(Yk_f) = (r,Z) -> Yk_f(Z*r)
@@ -53,7 +53,7 @@ include("test_convergence_rates.jl")
     ϕf = hydredwfn(n, ℓ, Z)
     ϕ′f = hydredwfn(n′, ℓ′, Z)
 
-    @testset "Grid = $(grid_type)" for (grid_type,tol) in grid_types
+    @testset "Grid = $(grid_type)" for (grid_type,tol,asymtol) in grid_types
         R = get_grid(grid_type, rmax, Z, ρ=0.1, ρmax=1.0)
         r = axes(R,1)
 
@@ -67,6 +67,13 @@ include("test_convergence_rates.jl")
         copyto!(potential, ρ)
         Y = potential.poisson.Y
         @test Y ≈ Ỹᵏ atol=tol
+
+        @testset "AsymptoticPoissonProblem" begin
+            R̃ = R[:,1:end-5]
+            apoisson = AsymptoticPoissonProblem(R, k, R̃)
+            CoulombIntegrals.solve!(apoisson, ρ)
+            @test Y ≈ apoisson.Y atol=asymtol
+        end
     end
 end
 

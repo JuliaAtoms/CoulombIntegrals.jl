@@ -15,6 +15,11 @@ end
 
 Base.eltype(::PoissonProblem{C}) where C = C
 
+function Base.show(io::IO, p::PoissonProblem{C}) where C
+    m,n = size(p.T⁻¹)
+    write(io, "$(m)×$(n) PoissonProblem $C, multipole = $(p.k)")
+end
+
 isrealtype(::Type{T}) where {T<:Real} = true
 isrealtype(::Type{T}) where {T<:Complex} = false
 
@@ -184,6 +189,8 @@ function AsymptoticPoissonProblem(R, k::Int,
 
     AsymptoticPoissonProblem(pp, R̃, inner, Y, view(Y, tail), Ỹ)
 end
+
+Base.eltype(poisson::AsymptoticPoissonProblem) = eltype(poisson.pp)
 
 function solve!(poisson::AsymptoticPoissonProblem, ρ::Density)
     solve!(poisson.pp, view(ρ.ρ, poisson.inner))

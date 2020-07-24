@@ -33,4 +33,9 @@ LinearAlgebra.mul!(y, potential::CoulombRepulsionPotential, x, α::Number=true, 
          mul!(potential.tmp, potential.V̂, x),
          α, β)
 
+Base.iszero(::CoulombRepulsionPotential) = false
+
+Base.show(io::IO, potential::CoulombRepulsionPotential) =
+    write(io, "CoulombRepulsionPotential based on solving $(typeof(potential.poisson))")
+
 export CoulombRepulsionPotential

@@ -19,6 +19,7 @@ julia = "1.5"
 
 [extras]
 ArnoldiMethod = "ec485272-7323-5ecc-a04f-4719b315124d"
+BandedMatrices = "aae01518-5342-5314-be14-df237901396f"
 Clustering = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
 FillArrays = "1a297f60-69ca-5386-bcde-b61e274b549b"
 OrthoPoly = "ac483fec-2b7d-5cc8-8517-3a560514e1d5"
@@ -30,4 +31,4 @@ RollingFunctions = "b0e4dd01-7b14-53d8-9b45-175a3e362653"
 UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [targets]
-test = ["ArnoldiMethod", "Clustering", "FillArrays", "OrthoPoly", "Parameters", "Polynomials", "PrettyTables", "ProgressMeter", "RollingFunctions", "UnicodePlots"]
+test = ["ArnoldiMethod", "BandedMatrices", "Clustering", "FillArrays", "OrthoPoly", "Parameters", "Polynomials", "PrettyTables", "ProgressMeter", "RollingFunctions", "UnicodePlots"]

@@ -33,6 +33,13 @@ LinearAlgebra.mul!(y, potential::CoulombRepulsionPotential, x, α::Number=true, 
          mul!(potential.tmp, potential.V̂, x),
          α, β)
 
+function Base.Matrix(potential::CoulombRepulsionPotential)
+    V̂ = potential.V̂
+    R = V̂.R
+    r = axes(R, 1)
+    Matrix(V̂, R \ inv.(r))
+end
+
 Base.iszero(::CoulombRepulsionPotential) = false
 
 Base.show(io::IO, potential::CoulombRepulsionPotential) =

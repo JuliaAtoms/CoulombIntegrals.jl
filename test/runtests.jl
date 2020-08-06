@@ -3,6 +3,7 @@ using CompactBases
 using FillArrays
 using LazyArrays
 using LinearAlgebra
+using BandedMatrices
 using Parameters
 using Test
 
@@ -62,11 +63,30 @@ include("test_convergence_rates.jl")
         ϕ = R \ ϕf.(r)
         ϕ′ = R \ ϕ′f.(r)
 
+        o = R \ one.(r)
+        out1 = similar(o)
+        out2 = similar(o)
+
         ρ = Density(applied(*,R,ϕ), applied(*,R,ϕ′))
         potential = CoulombRepulsionPotential(R, k)
         copyto!(potential, ρ)
         Y = potential.poisson.Y
         @test Y ≈ Ỹᵏ atol=tol
+
+        mpot = Matrix(potential)
+        @test mpot isa (R isa CompactBases.BSplineOrRestricted ? BandedMatrix : Diagonal)
+
+        mul!(out1, potential, o)
+        mul!(out2, LinearOperator(mpot, R), o)
+        if R isa CompactBases.BSplineOrRestricted
+            # Matricization does yield the same behaviour for the
+            # first few elements since the Dirichlet0 boundary
+            # condition at r=0 does not allow the accurate
+            # representation of Y/r.
+            @test out1[55:end] ≈ out2[55:end] atol=tol
+        else
+            @test out1 ≈ out2 atol=tol
+        end
 
         @testset "AsymptoticPoissonProblem" begin
             R̃ = R[:,1:end-5]

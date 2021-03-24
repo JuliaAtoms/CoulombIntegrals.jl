@@ -1,7 +1,6 @@
 using ArnoldiMethod
 import ContinuumArrays.QuasiArrays: AbstractQuasiMatrix
 using LazyArrays
-import LazyArrays: ⋆
 
 using Polynomials
 using OrthoPoly
@@ -57,7 +56,7 @@ function get_orbitals(R::B, ℓ::Int, Z, nev::Int,
         println(history)
         println(diag(schur.R))
 
-        [(n+ℓ,ℓ) => normalize!(R ⋆ (schur.Q[:,n]*sign(schur.Q[1,n]))) for n = 1:nev]
+        [(n+ℓ,ℓ) => normalize!(applied(*, R, (schur.Q[:,n]*sign(schur.Q[1,n])))) for n = 1:nev]
     elseif mode == :symbolic
         r = axes(R,1)
         [(n,ℓ) => applied(*, R, R \ hydredwfn(n,ℓ,Z).(r))

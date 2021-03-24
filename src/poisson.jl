@@ -31,12 +31,12 @@ basis `R`, `-∂ᵣ² + k(k+1)/r²`.
 """
 function get_double_laplacian(R,k,::Type{T}) where T
     D = Derivative(axes(R,1))
-    Tᵏ = apply(*, R', D', D, R)
+    Tᵏ = R'D'D*R
     r = axes(R,1)
     if Tᵏ isa BlockSkylineMatrix
         Tᵏ = Matrix(Tᵏ)
     end
-    V = apply(*, R', QuasiDiagonal(k*(k+1)./r.^2), R)
+    V = R'*QuasiDiagonal(k*(k+1)./r.^2)*R
     Tᵏ -= V
     isrealtype(T) ? Tᵏ : complex(Tᵏ)
 end
@@ -84,9 +84,9 @@ function PoissonProblem(R, k, ::Type{C}=eltype(R);
 end
 
 #=
-This method computes the integral \(Y^k(n\ell,n'\ell;r)/r\) where
+This method computes the integral \(Y^k(n\ell,n'\ell';r)/r\) where
 \[\begin{aligned}
-Y^k(n\ell,n'\ell;r)&\equiv
+Y^k(n\ell,n'\ell';r)&\equiv
 r\int_0^\infty
 U^k(r,s)
 P^*(n\ell;s)
@@ -107,7 +107,7 @@ P(n'\ell';s)
 through the solution of Poisson's problem
 \[\left[\frac{\mathrm{d}^2}{\mathrm{d}r^2} -
  \frac{k(k+1)}{r^2}\right]
-Y^k(n\ell,n'\ell;r)
+Y^k(n\ell,n'\ell';r)
 =-\frac{2k+1}{r}
 P^*(n\ell;r)P(n'\ell';r)\]
 subject to the boundary conditions

@@ -16,6 +16,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 julia = "1.5"
+CompactBases = "0.3"
 
 [extras]
 ArnoldiMethod = "ec485272-7323-5ecc-a04f-4719b315124d"

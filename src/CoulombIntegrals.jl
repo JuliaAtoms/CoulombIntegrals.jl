@@ -3,7 +3,7 @@ module CoulombIntegrals
 using LinearAlgebra
 
 using LazyArrays
-import LazyArrays: ⋆, materialize
+import LazyArrays: materialize
 import ContinuumArrays: axes
 import ContinuumArrays.QuasiArrays: AbstractQuasiArray, AbstractQuasiMatrix, MulQuasiArray, QuasiAdjoint
 using IntervalSets
@@ -14,7 +14,7 @@ using BlockBandedMatrices
 
 using SpecialFunctions
 
-const RadialOrbital{T,B<:AbstractQuasiMatrix} = Mul{<:Any, <:Tuple{B,<:AbstractVector{T}}}
+const RadialOrbital{T,B<:AbstractQuasiMatrix} = Applied{<:Any, typeof(*), <:Tuple{B,<:AbstractVector{T}}}
 
 include("analytical.jl")
 include("lazy-coulomb.jl")

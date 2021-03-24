@@ -20,10 +20,10 @@ include("test_convergence_rates.jl")
             N = ceil(Int, rmax/ρ)
             FiniteDifferences(N, ρ)
         elseif grid_type == :fd_loglin
-            StaggeredFiniteDifferences(0.1ρ, ρmax, α, rmax, 0*Z)
+            StaggeredFiniteDifferences(0.1ρ, ρmax, α, rmax)
         elseif grid_type == :implicit_fd
             N = ceil(Int, rmax/ρ)
-            ImplicitFiniteDifferences(N, ρ, false, 0*Z)
+            ImplicitFiniteDifferences(N, ρ)
         elseif grid_type == :fedvr
             t = range(0, stop=rmax, length=41)
             FEDVR(t, Vcat(10,Fill(7,length(t)-2)))[:,2:end-1]
@@ -128,7 +128,7 @@ include("poisson_problem_hermiticity.jl")
     fd_inputs(exponents,errors) =
         ("Finite-differences",
          (rₘₐₓ,N) -> begin
-         R = StaggeredFiniteDifferences(rₘₐₓ,N,Z)
+         R = StaggeredFiniteDifferences(rₘₐₓ,N)
          R,step(R)
          end,
          unique(ceil.(Int, 2 .^ exponents)),

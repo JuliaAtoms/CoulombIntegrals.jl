@@ -21,7 +21,7 @@ end
     N = 100
     ρ = 0.2
 
-    R = StaggeredFiniteDifferences(N, ρ, 0.0)
+    R = StaggeredFiniteDifferences(N, ρ)
     r = axes(R,1)
     D = Derivative(r)
     ∇² = apply(*, R', D', D, R)

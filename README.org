@@ -2,9 +2,8 @@
 #+AUTHOR: Stefanos Carlström
 #+EMAIL: stefanos.carlstrom@gmail.com
 
-[[https://travis-ci.org/jagot/CoulombIntegrals.jl][https://travis-ci.org/jagot/CoulombIntegrals.jl.svg?branch=master]]
-[[https://ci.appveyor.com/project/jagot/coulombintegrals-jl][https://img.shields.io/appveyor/ci/jagot/coulombintegrals-jl.svg?logo=appveyor]]
-[[https://codecov.io/gh/jagot/CoulombIntegrals.jl][https://codecov.io/gh/jagot/CoulombIntegrals.jl/branch/master/graph/badge.svg]]
+[[https://github.com/JuliaAtoms/CoulombIntegrals.jl/actions][https://github.com/JuliaAtoms/CoulombIntegrals.jl/workflows/CI/badge.svg]]
+[[https://codecov.io/gh/JuliaAtoms/CoulombIntegrals.jl][https://codecov.io/gh/JuliaAtoms/CoulombIntegrals.jl/branch/master/graph/badge.svg]]
 
 * Introduction
   Small library to calculate the different integrals that arise from

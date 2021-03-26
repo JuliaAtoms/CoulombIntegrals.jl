@@ -13,9 +13,8 @@
 
   The library is intended to be independent of basis chosen, and is
   based off [[https://github.com/JuliaApproximation/ContinuumArrays.jl][ContinuumArrays.jl]]. However, at the moment only
-  [[https://github.com/jagot/FiniteDifferencesQuasi.jl][FiniteDifferencesQuasi.jl]] and [[https://github.com/jagot/FEDVRQuasi.jl][FEDVRQuasi.jl]] are supported. Moreover,
-  it is only possible to work with 1d bases, i.e. tensorial bases are
-  not yet supported.
+  [[https://github.com/JuliaApproximation/CompactBases.jl][CompactBases.jl]] are supported. Moreover, it is only possible to work
+  with 1d bases, i.e. tensorial bases are not yet supported.
 
 * References
   - Froese Fischer, C., Brage, T., & Jönsson, P. (1997). Computational

@@ -26,12 +26,12 @@ end
 Base.replace_in_print_matrix(::LazyCoulomb, i::Integer, j::Integer, s::AbstractString) =
     i == j ? s : Base.replace_with_centered_mark(s)
 
-const CoulombIntegral{T} = Mul{<:Any,<:Tuple{
-    Mul{<:Any, <:Tuple{
+const CoulombIntegral{T} = Applied{<:Any, typeof(*),<:Tuple{
+    Applied{<:Any, typeof(*), <:Tuple{
         <:Adjoint{T,<:AbstractVector},
         <:AbstractQuasiMatrix}},
     <:LazyCoulomb{T,<:AbstractQuasiMatrix},
-    Mul{<:Any, <:Tuple{
+    Applied{<:Any, typeof(*), <:Tuple{
         <:AbstractQuasiMatrix,
         <:AbstractVector}}}}
 
@@ -48,7 +48,7 @@ function Base.copyto!(dest::AbstractVector{T}, M::CoulombIntegral{T}) where T
 
     tmp.args[2] .= 0
 
-    kv = k⋆Rv
+    kv = applied(*, k, Rv)
 
     for i in eachindex(r)
         k.diag .= K.(LC.ℓ,r,r[i])

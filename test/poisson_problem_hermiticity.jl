@@ -1,16 +1,17 @@
-function exchange_action!(w, poisson, V, v, ϕ, R)
+function exchange_action!(w, potential, u, v, x, ϕ, R)
     z = exp(im*ϕ)
-    poisson(applied(*, R, z*v))
-    mul!(w, V, poisson.uv.v, 1/z, false)
-    w
+    ρ = Density(u, applied(*, R, z*x))
+    copyto!(potential, ρ)
+    mul!(w, potential, v.args[2], 1/z)
 end
 
-function exchange_action(poisson, V, ϕ)
-    eye = complex(Matrix(1.0I, size(V)))
+function exchange_action(potential, u, v, ϕ, R)
+    n = size(R,2)
+    eye = complex(Matrix(1.0I, n, n))
     out = similar(eye)
-    R = poisson.ρ.args[1]
     for j = 1:size(eye,2)
-        exchange_action!(view(out, :, j), poisson, V,
+        exchange_action!(view(out, :, j),
+                         potential, u, v,
                          view(eye, :, j), ϕ, R)
     end
     out
@@ -20,7 +21,7 @@ end
     N = 100
     ρ = 0.2
 
-    R = RadialDifferences(N, ρ)
+    R = StaggeredFiniteDifferences(N, ρ)
     r = axes(R,1)
     D = Derivative(r)
     ∇² = apply(*, R', D', D, R)
@@ -32,14 +33,12 @@ end
     ee = eigen(H)
 
     @testset "n = $(n)" for n = 1:5
+        potential = CoulombRepulsionPotential(R, 0, ComplexF64)
         u = applied(*, R, complex(ee.vectors[:,n]))
         v = applied(*, R, complex(ee.vectors[:,n]))
-        w = similar(u)
-        V = Diagonal(w.args[2])
-        poisson = PoissonProblem(0, u, v, w′ = w)
 
         @testset "ϕ = $(ϕ)" for ϕ ∈ π*(0:1/8:2)
-            A = exchange_action(poisson, V, ϕ)
+            A = exchange_action(potential, u, v, ϕ, R)
             @test norm(A-A') < 1e-16
         end
     end

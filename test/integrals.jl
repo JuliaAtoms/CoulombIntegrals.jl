@@ -1,22 +1,17 @@
-function get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons; kwargs...)
-    u = get_orbitals(R, ℓ, Z, n-ℓ, orbital_mode,V)[end][2]
-    v = get_orbitals(R, ℓ′, Z, n′-ℓ′, orbital_mode,V)[end][2]
+function get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons,args...)
+    u = get_orbitals(R, ℓ, Z, n-ℓ, orbital_mode)[end][2]
+    v = get_orbitals(R, ℓ′, Z, n′-ℓ′, orbital_mode)[end][2]
     r = CoulombIntegrals.locs(R)
-    if coulomb_mode ∈ [:poisson,:poisson_cg]
-        # TODO: Enforce conjugate-gradient when `:poisson_cg`
+    if coulomb_mode == :poisson
         Π = if k ∈ keys(poissons)
             poissons[k]
         else
-            poissons[k] = PoissonProblem(k, u, v, kwargs...)
+            poissons[k] = PoissonProblem(R, k)
         end
-        Π.y.args[2] .= false
-        Π(u .⋆ v, verbosity=0)
-        if coulomb_mode == :poisson_cg
-            @test Π.solve_iterable.mv_products < 10
-            Π()
-            @test Π.solve_iterable.mv_products == 1
-        end
-        Π.w′.args[2].*r
+        Π.Y .= false
+        ρ = Density(u, v)
+        solve!(Π, ρ)
+        copy(Π.Y)
     elseif coulomb_mode == :direct
         LCk = LazyCoulomb(R,k)
         M = materialize(applied(*,u',LCk,v))
@@ -26,51 +21,49 @@ function get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons; 
     end
 end
 
-function get_Fᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
-    u = get_orbitals(R, ℓ, Z, n-ℓ, orbital_mode,V)[end][2]
-    v = get_orbitals(R, ℓ′, Z, n′-ℓ′, orbital_mode,V)[end][2]
+function get_Fᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode, V, S, r⁻¹,poissons,args...)
+    u = get_orbitals(R, ℓ, Z, n-ℓ, orbital_mode)[end][2]
+    v = get_orbitals(R, ℓ′, Z, n′-ℓ′, orbital_mode)[end][2]
     r = CoulombIntegrals.locs(R)
 
     # The F integrals are symmetric, and thus which orbital is used to
     # form the Yᵏ potential should not matter.
-    Yᵏ = get_Yᵏ(R,k,n,ℓ,n,ℓ,Z,orbital_mode,coulomb_mode,V,poissons)
-    Yᵏ′ = get_Yᵏ(R,k,n′,ℓ′,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
+    Yᵏ = get_Yᵏ(R,k,n,ℓ,n,ℓ,Z,orbital_mode,coulomb_mode,V,poissons,args...)
+    Yᵏ′ = get_Yᵏ(R,k,n′,ℓ′,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons,args...)
 
-    # Apply Slater potential to orbital
-    yv = applied(*, R, Diagonal(Yᵏ./r)*v.args[2])
-    yu = applied(*, R, Diagonal(Yᵏ′./r)*u.args[2])
+    ρv = Density(v, v)
+    ρu = Density(u, u)
 
     # Perform the integral over the other coordinate.
-    Fᵏ = apply(*, v', yv)
-    Fᵏ′ = apply(*, u', yu)
+    Fᵏ = dot(ρv.ρ, S, r⁻¹*Yᵏ)
+    Fᵏ′ = dot(ρu.ρ, S, r⁻¹*Yᵏ′)
 
     Fᵏ,Fᵏ′
 end
 
-function get_Gᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
-    u = get_orbitals(R, ℓ, Z, n-ℓ, orbital_mode,V)[end][2]
-    v = get_orbitals(R, ℓ′, Z, n′-ℓ′, orbital_mode,V)[end][2]
+function get_Gᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode, V, S, r⁻¹,poissons,args...)
+    u = get_orbitals(R, ℓ, Z, n-ℓ, orbital_mode)[end][2]
+    v = get_orbitals(R, ℓ′, Z, n′-ℓ′, orbital_mode)[end][2]
     r = CoulombIntegrals.locs(R)
 
-    Yᵏ = get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
+    Yᵏ = get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons,args...)
 
-    # Apply Slater potential to orbital
-    yv = applied(*, R, Diagonal(Yᵏ./r)*v.args[2])
-
+    ρ = Density(u, v)
+    
     # Perform the integral over the other coordinate.
-    Gᵏ = apply(*, u', yv)
+    Gᵏ = dot(ρ.ρ, S, r⁻¹*Yᵏ)
 end
 
-function Yᵏ_error(R, ρ, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mode,V,poissons)
+function Yᵏ_error(cache, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mode, args...)
+    @unpack R,ρ,V,poissons = cache
     N = size(R,2)
-    r = CoulombIntegrals.locs(R)
+    # r = CoulombIntegrals.locs(R)
+    r = axes(R,1)
 
     t = time()
-    Yᵏ = get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
+    Yᵏ = get_Yᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons,args...)
     el = time()-t
-    Ỹᵏ = V \ exact_Yᵏs[((n,ℓ),(n′,ℓ′),k)].(Z*r)
-    # Ugly work-around
-    CoulombIntegrals.weightit!(applied(*, R, Ỹᵏ))
+    Ỹᵏ = R \ exact_Yᵏs[((n,ℓ),(n′,ℓ′),k)].(Z*r)
 
     dYᵏ = Yᵏ - Ỹᵏ
     lδ = maximum(abs, dYᵏ)
@@ -85,12 +78,13 @@ function Yᵏ_error(R, ρ, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mod
     [N ρ orb_label(a) orb_label(b) k lδ gδ el]
 end
 
-function Fᵏ_error(R, ρ, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mode,V,poissons)
+function Fᵏ_error(cache, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mode, args...)
+    @unpack R, ρ, V, S, r⁻¹, poissons = cache
     N = size(R,2)
     r = CoulombIntegrals.locs(R)
 
     t = time()
-    Fᵏ,Fᵏ′ = get_Fᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
+    Fᵏ,Fᵏ′ = get_Fᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode, V, S, r⁻¹,poissons,args...)
     el = time()-t
 
     a = (n,ℓ)
@@ -100,12 +94,13 @@ function Fᵏ_error(R, ρ, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mod
     [N ρ orb_label(a) orb_label(b) orb_label(a) orb_label(b) k ev evf Fᵏ Fᵏ-evf Fᵏ′ Fᵏ′-evf Fᵏ-Fᵏ′ el]
 end
 
-function Gᵏ_error(R, ρ, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mode,V,poissons)
+function Gᵏ_error(cache, k, n, ℓ, n′, ℓ′, Z, orbital_mode, coulomb_mode, args...)
+    @unpack R, ρ, V, S, r⁻¹, poissons = cache
     N = size(R,2)
     r = CoulombIntegrals.locs(R)
 
     t = time()
-    Gᵏ = get_Gᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode,V,poissons)
+    Gᵏ = get_Gᵏ(R,k,n,ℓ,n′,ℓ′,Z,orbital_mode,coulomb_mode, V, S, r⁻¹,poissons,args...)
     el = time()-t
 
     a = (n,ℓ)

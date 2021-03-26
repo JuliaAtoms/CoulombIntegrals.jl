@@ -5,29 +5,30 @@ version = "0.1.0"
 
 [deps]
 BlockBandedMatrices = "ffab5731-97b5-5995-9138-79e8c1846df0"
+CompactBases = "2c0377a8-7469-4ebd-be0f-82e501f20078"
 ContinuumArrays = "7ae1f121-cc2c-504b-ac30-9b923412ae5c"
-FEDVRQuasi = "a2e24d02-e4f7-11e8-15c0-0b59d0e1f6f3"
-FiniteDifferencesQuasi = "2e420920-f185-11e8-29af-4b87f0732ba2"
 IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
-IterativeFactorizations = "f1b39ad4-3e99-11e9-193e-b3ae8ec46476"
 LazyArrays = "5078a376-72f3-5289-bfd5-ec5146d43c02"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
 QuasiArrays = "c4ea9172-b204-11e9-377d-29865faadc5c"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 julia = "1.5"
+CompactBases = "0.3"
 
 [extras]
 ArnoldiMethod = "ec485272-7323-5ecc-a04f-4719b315124d"
+BandedMatrices = "aae01518-5342-5314-be14-df237901396f"
+ClassicalOrthogonalPolynomials = "b30e2e7b-c4ee-47da-9d5f-2c5c27239acd"
 Clustering = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
 FillArrays = "1a297f60-69ca-5386-bcde-b61e274b549b"
-OrthoPoly = "ac483fec-2b7d-5cc8-8517-3a560514e1d5"
+Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 RollingFunctions = "b0e4dd01-7b14-53d8-9b45-175a3e362653"
+UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [targets]
-test = ["ArnoldiMethod", "Clustering", "FillArrays", "OrthoPoly", "PrettyTables", "ProgressMeter", "RollingFunctions"]
+test = ["ArnoldiMethod", "BandedMatrices", "ClassicalOrthogonalPolynomials", "Clustering", "FillArrays","Parameters", "PrettyTables", "ProgressMeter", "RollingFunctions", "UnicodePlots"]

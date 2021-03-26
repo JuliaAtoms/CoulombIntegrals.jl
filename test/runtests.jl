@@ -79,7 +79,7 @@ include("test_convergence_rates.jl")
         mul!(out1, potential, o)
         mul!(out2, LinearOperator(mpot, R), o)
         if R isa CompactBases.BSplineOrRestricted
-            # Matricization does yield the same behaviour for the
+            # Matricization does not yield the same behaviour for the
             # first few elements since the Dirichlet0 boundary
             # condition at r=0 does not allow the accurate
             # representation of Y/r.

@@ -1,7 +1,7 @@
 name = "CoulombIntegrals"
 uuid = "42e5845a-f9f1-11e8-0afe-795ea56ed153"
 authors = ["Stefanos Carlström <stefanos.carlstrom@gmail.com>"]
-version = "0.1.4"
+version = "0.1.5"
 
 [deps]
 BlockBandedMatrices = "ffab5731-97b5-5995-9138-79e8c1846df0"
